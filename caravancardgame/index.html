@@ -1,0 +1,293 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warren Woodhouse: Caravan - Fallout: New Vegas Guide</title>
+    <style>
+        :root {
+            --felt-green: #2b5836;
+            --felt-dark: #1e3f26;
+            --text-light: #e8e6d9;
+            --gold: #d4af37;
+        }
+
+        body {
+            background-color: var(--felt-green);
+            color: var(--text-light);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .instructions {
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        /* Board Layout */
+        #game-board {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: var(--felt-dark);
+            border-radius: 10px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .caravan {
+            width: 120px;
+            min-height: 180px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .caravan:hover {
+            border-color: var(--gold);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .caravan-score {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Score Colors based on Caravan Rules */
+        .score-under { color: white; }
+        .score-perfect { color: #00ff00; } /* 21-26 */
+        .score-over { color: #ff3333; } /* >26 */
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 5px;
+            width: 70px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            margin-bottom: -70px; /* Stack cards visually */
+            position: relative;
+            z-index: 1;
+        }
+
+        .card.red { color: #d00; }
+        .card.black { color: #111; }
+
+        /* Hand */
+        #player-hand {
+            display: flex;
+            gap: 10px;
+            min-height: 110px;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 800px;
+        }
+
+        .hand-card {
+            margin-bottom: 0;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .hand-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .hand-card.selected {
+            border: 3px solid var(--gold);
+            transform: translateY(-15px);
+        }
+
+        #deck-info {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Caravan</h1>
+    <p class="instructions">
+        <strong>Goal:</strong> Build 3 caravans with weights between 21 and 26.<br>
+        <strong>Rules:</strong> Select a card from your hand, then click a caravan to place it. Number cards add their value. Playing a King (K) doubles the value of the entire caravan. (Simplified Ruleset).
+    </p>
+
+    <!-- Player Board -->
+    <div id="game-board">
+        <div class="caravan" id="caravan-0" onclick="playToCaravan(0)">
+            <div class="caravan-score score-under" id="score-0">0</div>
+            <div id="cards-0"></div>
+        </div>
+        <div class="caravan" id="caravan-1" onclick="playToCaravan(1)">
+            <div class="caravan-score score-under" id="score-1">0</div>
+            <div id="cards-1"></div>
+        </div>
+        <div class="caravan" id="caravan-2" onclick="playToCaravan(2)">
+            <div class="caravan-score score-under" id="score-2">0</div>
+            <div id="cards-2"></div>
+        </div>
+    </div>
+
+    <!-- Player Hand -->
+    <div id="player-hand"></div>
+    <div id="deck-info">Cards left in deck: <span id="deck-count">0</span></div>
+
+    <script>
+        // Game State
+        const suits = ['♠', '♣', '♥', '♦'];
+        const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        let deck = [];
+        let hand = [];
+        let caravans = [[], [], []]; // 3 tracks
+        let selectedCardIndex = null;
+
+        // Initialize Game
+        function initGame() {
+            buildDeck();
+            shuffleDeck();
+            for(let i = 0; i < 8; i++) drawCard();
+            renderHand();
+            renderCaravans();
+        }
+
+        function buildDeck() {
+            deck = [];
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({ suit, value, color: (suit === '♥' || suit === '♦') ? 'red' : 'black' });
+                }
+            }
+        }
+
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        function drawCard() {
+            if (deck.length > 0 && hand.length < 8) {
+                hand.push(deck.pop());
+                document.getElementById('deck-count').innerText = deck.length;
+            }
+        }
+
+        // Card Selection Logic
+        function selectCard(index) {
+            if (selectedCardIndex === index) {
+                selectedCardIndex = null; // deselect
+            } else {
+                selectedCardIndex = index;
+            }
+            renderHand();
+        }
+
+        // Playing a card to a caravan
+        function playToCaravan(caravanIndex) {
+            if (selectedCardIndex === null) return;
+
+            const card = hand[selectedCardIndex];
+            
+            // Simplified logic: Face cards like J and Q are restricted in this MVP.
+            if (card.value === 'J' || card.value === 'Q') {
+                alert("Jacks and Queens require targeting specific cards (omitted in this simplified version). Try a number or King!");
+                return;
+            }
+
+            // Move card from hand to caravan
+            caravans[caravanIndex].push(card);
+            hand.splice(selectedCardIndex, 1);
+            selectedCardIndex = null;
+            
+            drawCard();
+            renderHand();
+            renderCaravans();
+        }
+
+        // Calculate and Render Caravans
+        function renderCaravans() {
+            for (let i = 0; i < 3; i++) {
+                const container = document.getElementById(`cards-${i}`);
+                const scoreElement = document.getElementById(`score-${i}`);
+                container.innerHTML = '';
+                
+                let score = 0;
+                let multiplier = 1;
+
+                // Process cards in caravan
+                caravans[i].forEach((card, index) => {
+                    let cardVal = 0;
+                    
+                    if (card.value === 'A') cardVal = 1;
+                    else if (card.value === 'K') multiplier *= 2;
+                    else if (!isNaN(card.value)) cardVal = parseInt(card.value);
+                    
+                    score += cardVal;
+
+                    // Render card div
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = `card ${card.color}`;
+                    cardDiv.style.zIndex = index;
+                    cardDiv.innerText = `${card.value}${card.suit}`;
+                    container.appendChild(cardDiv);
+                });
+
+                // Apply Kings
+                const finalScore = score * multiplier;
+                scoreElement.innerText = finalScore;
+
+                // Color code score
+                scoreElement.className = 'caravan-score';
+                if (finalScore >= 21 && finalScore <= 26) scoreElement.classList.add('score-perfect');
+                else if (finalScore > 26) scoreElement.classList.add('score-over');
+                else scoreElement.classList.add('score-under');
+            }
+        }
+
+        // Render Hand UI
+        function renderHand() {
+            const handContainer = document.getElementById('player-hand');
+            handContainer.innerHTML = '';
+            
+            hand.forEach((card, index) => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = `card hand-card ${card.color} ${index === selectedCardIndex ? 'selected' : ''}`;
+                cardDiv.innerText = `${card.value}${card.suit}`;
+                cardDiv.onclick = () => selectCard(index);
+                handContainer.appendChild(cardDiv);
+            });
+        }
+
+        // Start
+        initGame();
+    </script>
+</body>
+</html>
