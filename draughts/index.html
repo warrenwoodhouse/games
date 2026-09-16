@@ -1,0 +1,781 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draughts (Checkers) - GotGames - Warren Woodhouse</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.7);
+            --board-light: #e2e8f0;
+            --board-dark: #334155;
+            --accent-red: #ef4444;
+            --accent-black: #1e293b;
+            --piece-red: radial-gradient(circle, #f87171 20%, #dc2626 80%);
+            --piece-black: radial-gradient(circle, #475569 20%, #0f172a 80%);
+            --highlight-move: rgba(34, 197, 94, 0.6);
+            --highlight-selected: rgba(234, 179, 8, 0.7);
+            --text-color: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            align-items: flex-start;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        /* Controls & Side Panel */
+        .panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            width: 280px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .status-box {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.2);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .turn-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .turn-red { background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); }
+        .turn-black { background: #94a3b8; box-shadow: 0 0 8px #94a3b8; }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+        .score-item span {
+            display: block;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        select, button {
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: none;
+            background: #334155;
+            color: white;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        select:hover, button:hover {
+            background: #475569;
+        }
+
+        button.btn-primary {
+            background: #2563eb;
+            font-weight: bold;
+        }
+        button.btn-primary:hover {
+            background: #3b82f6;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Draughts Board */
+        .board-container {
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 4px solid #334155;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            width: min(85vw, 520px);
+            height: min(85vw, 520px);
+        }
+
+        .square {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .square.light { background-color: var(--board-light); }
+        .square.dark { background-color: var(--board-dark); }
+
+        .square.selected {
+            background-color: var(--highlight-selected) !important;
+        }
+
+        .square.valid-move::after {
+            content: '';
+            width: 30%;
+            height: 30%;
+            background-color: var(--highlight-move);
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 10px var(--highlight-move);
+        }
+
+        /* Game Pieces */
+        .piece {
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.3);
+        }
+
+        .piece:hover {
+            transform: scale(1.06);
+        }
+
+        .piece.red {
+            background: var(--piece-red);
+            border: 2px solid #b91c1c;
+        }
+
+        .piece.black {
+            background: var(--piece-black);
+            border: 2px solid #020617;
+        }
+
+        .piece.king::before {
+            content: '♔';
+            font-size: 1.8rem;
+            color: #fef08a;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            line-height: 0;
+        }
+
+        /* Move Log */
+        .log-container {
+            height: 120px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 0.85rem;
+            font-family: monospace;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+        .log-entry {
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Overlay Modal */
+        .modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal h2 {
+            font-size: 2rem;
+            color: #fef08a;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Draughts (Checkers)</h1>
+    <h2>Game by Warren Woodhouse. &copy;2026 <a href="https://warrenwoodhouse.blogspot.com/">Warren Woodhouse</a>.</h2>
+
+    <div class="container">
+        <!-- Main Board -->
+        <div class="board-container">
+            <div id="board"></div>
+
+            <div id="game-over-modal" class="modal">
+                <h2 id="winner-message">Red Wins!</h2>
+                <button class="btn-primary" onclick="game.resetGame()">Play Again</button>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="panel">
+            <div class="status-box">
+                <span id="turn-indicator" class="turn-indicator turn-red"></span>
+                <span id="status-text">Red's Turn</span>
+            </div>
+
+            <div class="score-board">
+                <div class="score-item">
+                    <label>Red (Player)</label>
+                    <span id="score-red">12</span>
+                </div>
+                <div class="score-item">
+                    <label>Black (Opponent)</label>
+                    <span id="score-black">12</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="mode-select">Game Mode</label>
+                <select id="mode-select" onchange="game.setMode(this.value)">
+                    <option value="ai">Player vs AI</option>
+                    <option value="pvp">Player vs Player (Local)</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="difficulty-group">
+                <label for="difficulty-select">AI Difficulty</label>
+                <select id="difficulty-select" onchange="game.setDifficulty(this.value)">
+                    <option value="easy">Easy (Casual)</option>
+                    <option value="medium" selected>Medium (Standard)</option>
+                    <option value="hard">Hard (Minimax Lookahead)</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button style="flex: 1;" onclick="game.undoMove()" id="undo-btn">Undo</button>
+                <button class="btn-primary" style="flex: 1;" onclick="game.resetGame()">New Game</button>
+            </div>
+
+            <label>Move History</label>
+            <div class="log-container" id="move-log"></div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Advanced Draughts / Checkers Game Logic & AI Engine
+         */
+        class DraughtsEngine {
+            constructor() {
+                this.board = Array(8).fill(null).map(() => Array(8).fill(null));
+                this.turn = 'red'; // 'red' moves up (-1), 'black' moves down (+1)
+                this.selectedPiece = null; // {r, c}
+                this.validMoves = [];
+                this.mustJumpPiece = null; // Forces continuing jump during multi-jumps
+                this.mode = 'ai'; // 'ai' or 'pvp'
+                this.difficulty = 'medium';
+                this.history = [];
+                this.isGameOver = false;
+
+                this.initBoard();
+                this.renderBoard();
+                this.updateUI();
+            }
+
+            initBoard() {
+                this.board = Array(8).fill(null).map(() => Array(8).fill(null));
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        if ((r + c) % 2 === 1) {
+                            if (r < 3) this.board[r][c] = { color: 'black', king: false };
+                            else if (r > 4) this.board[r][c] = { color: 'red', king: false };
+                        }
+                    }
+                }
+            }
+
+            resetGame() {
+                this.initBoard();
+                this.turn = 'red';
+                this.selectedPiece = null;
+                this.validMoves = [];
+                this.mustJumpPiece = null;
+                this.history = [];
+                this.isGameOver = false;
+                document.getElementById('game-over-modal').classList.remove('active');
+                document.getElementById('move-log').innerHTML = '';
+                this.renderBoard();
+                this.updateUI();
+            }
+
+            setMode(mode) {
+                this.mode = mode;
+                document.getElementById('difficulty-group').style.display = mode === 'ai' ? 'flex' : 'none';
+                this.resetGame();
+            }
+
+            setDifficulty(diff) {
+                this.difficulty = diff;
+            }
+
+            // --- Move & Rules Calculation ---
+
+            getAllValidMoves(color, board = this.board) {
+                let jumps = [];
+                let moves = [];
+
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        const p = board[r][c];
+                        if (p && p.color === color) {
+                            const pJumps = this.getPieceJumps(r, c, board);
+                            if (pJumps.length > 0) {
+                                jumps.push(...pJumps);
+                            } else {
+                                moves.push(...this.getPieceSimpleMoves(r, c, board));
+                            }
+                        }
+                    }
+                }
+
+                // Mandatory Jump Rule: If any jump exists, ONLY jumps are allowed
+                return jumps.length > 0 ? jumps : moves;
+            }
+
+            getPieceMoves(r, c, board = this.board) {
+                if (this.mustJumpPiece) {
+                    if (this.mustJumpPiece.r !== r || this.mustJumpPiece.c !== c) return [];
+                    return this.getPieceJumps(r, c, board);
+                }
+
+                const allMoves = this.getAllValidMoves(this.turn, board);
+                return allMoves.filter(m => m.from.r === r && m.from.c === c);
+            }
+
+            getPieceDirections(piece) {
+                const dirs = [];
+                if (piece.color === 'red' || piece.king) dirs.push([-1, -1], [-1, 1]); // Up
+                if (piece.color === 'black' || piece.king) dirs.push([1, -1], [1, 1]);  // Down
+                return dirs;
+            }
+
+            getPieceSimpleMoves(r, c, board) {
+                const piece = board[r][c];
+                if (!piece) return [];
+                const moves = [];
+                const dirs = this.getPieceDirections(piece);
+
+                for (let [dr, dc] of dirs) {
+                    let nr = r + dr, nc = c + dc;
+                    if (this.inBounds(nr, nc) && board[nr][nc] === null) {
+                        moves.push({
+                            from: {r, c},
+                            to: {r: nr, c: nc},
+                            isJump: false,
+                            captured: null
+                        });
+                    }
+                }
+                return moves;
+            }
+
+            getPieceJumps(r, c, board) {
+                const piece = board[r][c];
+                if (!piece) return [];
+                const jumps = [];
+                const dirs = this.getPieceDirections(piece);
+
+                for (let [dr, dc] of dirs) {
+                    let mr = r + dr, mc = c + dc;      // Middle/enemy piece
+                    let nr = r + dr * 2, nc = c + dc * 2; // Landing spot
+
+                    if (this.inBounds(nr, nc)) {
+                        const midPiece = board[mr][mc];
+                        if (midPiece && midPiece.color !== piece.color && board[nr][nc] === null) {
+                            jumps.push({
+                                from: {r, c},
+                                to: {r: nr, c: nc},
+                                isJump: true,
+                                captured: {r: mr, c: mc}
+                            });
+                        }
+                    }
+                }
+                return jumps;
+            }
+
+            inBounds(r, c) {
+                return r >= 0 && r < 8 && c >= 0 && c < 8;
+            }
+
+            // --- Move Execution ---
+
+            makeMove(move) {
+                // Save history state
+                this.history.push({
+                    board: JSON.parse(JSON.stringify(this.board)),
+                    turn: this.turn,
+                    mustJumpPiece: this.mustJumpPiece ? {...this.mustJumpPiece} : null
+                });
+
+                const piece = this.board[move.from.r][move.from.c];
+                this.board[move.to.r][move.to.c] = piece;
+                this.board[move.from.r][move.from.c] = null;
+
+                let crowned = false;
+                // King Promotion
+                if (!piece.king) {
+                    if ((piece.color === 'red' && move.to.r === 0) || (piece.color === 'black' && move.to.r === 7)) {
+                        piece.king = true;
+                        crowned = true;
+                    }
+                }
+
+                // Remove captured piece
+                if (move.isJump) {
+                    this.board[move.captured.r][move.captured.c] = null;
+                }
+
+                this.logMove(move);
+
+                // Check for multi-jump condition
+                if (move.isJump && !crowned) {
+                    const furtherJumps = this.getPieceJumps(move.to.r, move.to.c, this.board);
+                    if (furtherJumps.length > 0) {
+                        this.mustJumpPiece = { r: move.to.r, c: move.to.c };
+                        this.selectedPiece = { r: move.to.r, c: move.to.c };
+                        this.validMoves = furtherJumps;
+                        this.renderBoard();
+                        this.updateUI();
+                        return;
+                    }
+                }
+
+                // Switch Turns
+                this.mustJumpPiece = null;
+                this.selectedPiece = null;
+                this.validMoves = [];
+                this.turn = this.turn === 'red' ? 'black' : 'red';
+
+                this.checkGameOver();
+                this.renderBoard();
+                this.updateUI();
+
+                // Trigger AI Turn if applicable
+                if (!this.isGameOver && this.mode === 'ai' && this.turn === 'black') {
+                    setTimeout(() => this.makeAIMove(), 300);
+                }
+            }
+
+            undoMove() {
+                if (this.history.length === 0) return;
+                
+                // If against AI, undo twice to go back to Player turn
+                let steps = (this.mode === 'ai' && this.history.length >= 2) ? 2 : 1;
+                
+                let state;
+                while (steps > 0 && this.history.length > 0) {
+                    state = this.history.pop();
+                    steps--;
+                }
+
+                if (state) {
+                    this.board = state.board;
+                    this.turn = state.turn;
+                    this.mustJumpPiece = state.mustJumpPiece;
+                    this.selectedPiece = null;
+                    this.validMoves = [];
+                    this.isGameOver = false;
+                    document.getElementById('game-over-modal').classList.remove('active');
+                    this.renderBoard();
+                    this.updateUI();
+                }
+            }
+
+            // --- AI Engine (Minimax with Alpha-Beta Pruning) ---
+
+            makeAIMove() {
+                let move = null;
+                if (this.difficulty === 'easy') {
+                    const moves = this.getAllValidMoves('black');
+                    move = moves[Math.floor(Math.random() * moves.length)];
+                } else {
+                    const depth = this.difficulty === 'medium' ? 3 : 5;
+                    move = this.getBestMoveMinimax(depth);
+                }
+
+                if (move) {
+                    this.makeMove(move);
+                }
+            }
+
+            getBestMoveMinimax(depth) {
+                let bestScore = -Infinity;
+                let bestMove = null;
+                const moves = this.getAllValidMoves('black');
+
+                for (let move of moves) {
+                    const simulatedBoard = this.simulateMove(this.board, move);
+                    let score = this.minimax(simulatedBoard, depth - 1, false, -Infinity, Infinity);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove = move;
+                    }
+                }
+                return bestMove;
+            }
+
+            minimax(board, depth, isMaximizing, alpha, beta) {
+                if (depth === 0 || this.isTerminalNode(board)) {
+                    return this.evaluateBoard(board);
+                }
+
+                const color = isMaximizing ? 'black' : 'red';
+                const moves = this.getAllValidMoves(color, board);
+
+                if (moves.length === 0) {
+                    return isMaximizing ? -1000 : 1000;
+                }
+
+                if (isMaximizing) {
+                    let maxEval = -Infinity;
+                    for (let move of moves) {
+                        const nextBoard = this.simulateMove(board, move);
+                        let evalScore = this.minimax(nextBoard, depth - 1, false, alpha, beta);
+                        maxEval = Math.max(maxEval, evalScore);
+                        alpha = Math.max(alpha, evalScore);
+                        if (beta <= alpha) break; // Pruning
+                    }
+                    return maxEval;
+                } else {
+                    let minEval = Infinity;
+                    for (let move of moves) {
+                        const nextBoard = this.simulateMove(board, move);
+                        let evalScore = this.minimax(nextBoard, depth - 1, true, alpha, beta);
+                        minEval = Math.min(minEval, evalScore);
+                        beta = Math.min(beta, evalScore);
+                        if (beta <= alpha) break; // Pruning
+                    }
+                    return minEval;
+                }
+            }
+
+            simulateMove(board, move) {
+                const newBoard = JSON.parse(JSON.stringify(board));
+                const piece = newBoard[move.from.r][move.from.c];
+                newBoard[move.to.r][move.to.c] = piece;
+                newBoard[move.from.r][move.from.c] = null;
+
+                if (!piece.king) {
+                    if ((piece.color === 'red' && move.to.r === 0) || (piece.color === 'black' && move.to.r === 7)) {
+                        piece.king = true;
+                    }
+                }
+
+                if (move.isJump) {
+                    newBoard[move.captured.r][move.captured.c] = null;
+                }
+                return newBoard;
+            }
+
+            evaluateBoard(board) {
+                let score = 0;
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        const piece = board[r][c];
+                        if (piece) {
+                            let val = piece.king ? 15 : 10;
+                            // Add positioning value (prefer center control and backline defense)
+                            val += (piece.color === 'black' ? r : (7 - r)) * 0.5;
+                            if (c === 0 || c === 7) val += 0.5; // Edge stability
+
+                            score += piece.color === 'black' ? val : -val;
+                        }
+                    }
+                }
+                return score;
+            }
+
+            isTerminalNode(board) {
+                return this.getAllValidMoves('red', board).length === 0 || 
+                       this.getAllValidMoves('black', board).length === 0;
+            }
+
+            // --- Game State & UI Render ---
+
+            checkGameOver() {
+                const currentMoves = this.getAllValidMoves(this.turn);
+                if (currentMoves.length === 0) {
+                    this.isGameOver = true;
+                    const winner = this.turn === 'red' ? 'Black' : 'Red';
+                    document.getElementById('winner-message').innerText = `${winner} Wins!`;
+                    document.getElementById('game-over-modal').classList.add('active');
+                }
+            }
+
+            logMove(move) {
+                const log = document.getElementById('move-log');
+                const fromCol = String.fromCharCode(65 + move.from.c);
+                const fromRow = 8 - move.from.r;
+                const toCol = String.fromCharCode(65 + move.to.c);
+                const toRow = 8 - move.to.r;
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerText = `${this.turn.toUpperCase()}: ${fromCol}${fromRow} ${move.isJump ? 'x' : '→'} ${toCol}${toRow}`;
+                log.prepend(entry);
+            }
+
+            updateUI() {
+                // Count pieces
+                let redCount = 0, blackCount = 0;
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        if (this.board[r][c]?.color === 'red') redCount++;
+                        if (this.board[r][c]?.color === 'black') blackCount++;
+                    }
+                }
+
+                document.getElementById('score-red').innerText = redCount;
+                document.getElementById('score-black').innerText = blackCount;
+
+                const statusText = document.getElementById('status-text');
+                const indicator = document.getElementById('turn-indicator');
+                
+                statusText.innerText = `${this.turn.charAt(0).toUpperCase() + this.turn.slice(1)}'s Turn`;
+                indicator.className = `turn-indicator turn-${this.turn}`;
+
+                document.getElementById('undo-btn').disabled = this.history.length === 0 || (this.mode === 'ai' && this.turn === 'black');
+            }
+
+            renderBoard() {
+                const boardElem = document.getElementById('board');
+                boardElem.innerHTML = '';
+
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        const square = document.createElement('div');
+                        square.className = `square ${(r + c) % 2 === 1 ? 'dark' : 'light'}`;
+                        square.dataset.row = r;
+                        square.dataset.col = c;
+
+                        // Highlight selection & valid moves
+                        if (this.selectedPiece && this.selectedPiece.r === r && this.selectedPiece.c === c) {
+                            square.classList.add('selected');
+                        }
+
+                        if (this.validMoves.some(m => m.to.r === r && m.to.c === c)) {
+                            square.classList.add('valid-move');
+                        }
+
+                        // Piece Rendering
+                        const piece = this.board[r][c];
+                        if (piece) {
+                            const pieceElem = document.createElement('div');
+                            pieceElem.className = `piece ${piece.color} ${piece.king ? 'king' : ''}`;
+                            square.appendChild(pieceElem);
+                        }
+
+                        square.addEventListener('click', () => this.handleSquareClick(r, c));
+                        boardElem.appendChild(square);
+                    }
+                }
+            }
+
+            handleSquareClick(r, c) {
+                if (this.isGameOver) return;
+                if (this.mode === 'ai' && this.turn === 'black') return; // Block human interaction on AI turn
+
+                const clickedPiece = this.board[r][c];
+
+                // Check if clicking a destination valid move square
+                const targetMove = this.validMoves.find(m => m.to.r === r && m.to.c === c);
+                if (targetMove) {
+                    this.makeMove(targetMove);
+                    return;
+                }
+
+                // Disallow selecting another piece if forced to multi-jump
+                if (this.mustJumpPiece) return;
+
+                // Select Piece
+                if (clickedPiece && clickedPiece.color === this.turn) {
+                    const pieceMoves = this.getPieceMoves(r, c);
+                    if (pieceMoves.length > 0) {
+                        this.selectedPiece = { r, c };
+                        this.validMoves = pieceMoves;
+                    } else {
+                        this.selectedPiece = null;
+                        this.validMoves = [];
+                    }
+                    this.renderBoard();
+                }
+            }
+        }
+
+        // Initialize Game Instance
+        const game = new DraughtsEngine();
+    </script>
+</body>
+</html>
