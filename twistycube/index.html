@@ -1,0 +1,33 @@
+<h1>Twisty Cube</h1><div>Copyright &copy;2026 GotGames Interactive. A Warren Woodhouse Company. Built using: Cubing API. Rubik’s Cube is a registered trademark of The Rubik’s Company.</div><div><br /></div><div>A fun interactive minigame that features the Rubik’s Cube.
+    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Twisty Cube - GotGames Interactive - Warren Woodhouse</title>
+  
+  <!-- 1. Load the cubing.js twisty player module -->
+  <script type="module" src="https://cdn.cubing.net/v0/js/cubing/twisty"></script>
+  
+  <style>
+    /* 2. Set the size of your cube container */
+    .cube-container {
+      width: 400px; 
+      height: 400px;
+      margin: 50px auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cube-container">
+    <!-- 3. Add the cube to your page -->
+    <twisty-player 
+      puzzle="3x3x3" 
+      alg="R U R' U R U2 R'" 
+      background="none">
+    </twisty-player>
+  </div>
+
+</body>
+</html>
