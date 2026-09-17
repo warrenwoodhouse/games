@@ -54,10 +54,11 @@ These game engines were used in the development of my games. Some of these are C
 
 ## coding languages
 * [YaBASIC](https://www.yabasic.de/)
-* [HTML HyperText Markup Language](https://html.spec.whatwg.org/) <small>([HTML Living Standard on GitHub](https://github.com/whatwg/html))</small>
+* [HTML HyperText Markup Language](https://html.spec.whatwg.org/) <caption>([HTML Living Standard on GitHub](https://github.com/whatwg/html))</caption>
 * [JavaScript](https://www.javascript.com/)
-* [ISO C++](https://isocpp.org/) <small>([Topic on GitHub](https://github.com/topics/cpp))</small>
-* [Python](https://www.python.org/) <small>([Python on GitHub](https://github.com/python))</small>
+* [ISO C++](https://isocpp.org/) <caption>([Topic on GitHub](https://github.com/topics/cpp))</caption>
+* [Python](https://www.python.org/) <caption>([Python on GitHub](https://github.com/python))</caption>
+* [Cubing](https://js.cubing.net/) <caption>([CubingJS on GitHub](https://github.com/cubing/cubing.js))</caption>
 
 ## game engines
 * Warren Engine: A in-house programming framework for developing games. Currently under development.
