@@ -1,0 +1,739 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>#FIAJ Fart in a Jar - GotGames Interactive - Warren Woodhouse</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: radial-gradient(circle at center, #111a10 0%, #050805 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 90vh;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header UI */
+        header {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            color: #39ff14;
+            text-shadow: 0 0 15px rgba(57, 255, 20, 0.8), 0 0 30px rgba(57, 255, 20, 0.4);
+            letter-spacing: 2px;
+        }
+
+        .subtext {
+            margin: 5px 0 0 0;
+            font-size: 0.95rem;
+            color: #a3e635;
+            opacity: 0.8;
+        }
+
+        /* Stink Meter UI */
+        .stink-meter-container {
+            width: 85%;
+            background: rgba(0, 20, 0, 0.6);
+            border: 2px solid #22c55e;
+            border-radius: 15px;
+            padding: 12px 18px;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .meter-info {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            color: #86efac;
+        }
+
+        .meter-bar-bg {
+            width: 100%;
+            height: 16px;
+            background: #0d2818;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #16a34a;
+        }
+
+        .meter-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #84cc16, #22c55e, #a3e635);
+            box-shadow: 0 0 12px #39ff14;
+            transition: width 0.3s ease;
+        }
+
+        .stats {
+            text-align: center;
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: #bbf7d0;
+        }
+
+        /* Jar Stage & Visual Effects */
+        .jar-stage {
+            position: relative;
+            width: 100%;
+            height: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Ambient Misty Fog */
+        .mist-container {
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            pointer-events: none;
+        }
+
+        .mist {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(57, 255, 20, 0.25) 0%, rgba(20, 80, 20, 0.05) 60%, transparent 80%);
+            filter: blur(25px);
+            animation: pulseMist 4s infinite alternate ease-in-out;
+        }
+
+        .mist-1 { width: 280px; height: 280px; top: 10px; left: 20px; animation-delay: 0s; }
+        .mist-2 { width: 220px; height: 220px; bottom: 20px; right: 30px; animation-delay: -2s; }
+
+        @keyframes pulseMist {
+            0% { transform: scale(0.8) rotate(0deg); opacity: 0.4; }
+            100% { transform: scale(1.25) rotate(15deg); opacity: 0.8; }
+        }
+
+        /* The Jar */
+        .jar {
+            position: relative;
+            width: 170px;
+            height: 230px;
+            cursor: pointer;
+            transform-origin: bottom center;
+            transition: transform 0.08s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+
+        /* Squish animation when pressed */
+        .jar.squish {
+            transform: scale(1.18, 0.78);
+        }
+
+        /* Jar Lid */
+        .lid {
+            position: absolute;
+            top: 0;
+            left: 15px;
+            width: 140px;
+            height: 35px;
+            background: linear-gradient(180deg, #4b5563 0%, #1f2937 100%);
+            border: 2px solid #6b7280;
+            border-radius: 8px 8px 3px 3px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            z-index: 3;
+        }
+
+        .lid-stripe {
+            width: 100%;
+            height: 6px;
+            background: repeating-linear-gradient(45deg, #eab308, #eab308 10px, #000 10px, #000 20px);
+            margin-top: 12px;
+            opacity: 0.85;
+        }
+
+        /* Glass Jar Body */
+        .glass-body {
+            position: absolute;
+            top: 30px;
+            left: 0;
+            width: 170px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px 20px 35px 35px;
+            box-shadow: inset 0 0 25px rgba(255, 255, 255, 0.2), 0 0 35px rgba(57, 255, 20, 0.3);
+            overflow: hidden;
+            backdrop-filter: blur(1px);
+        }
+
+        /* Glass Reflection Shine */
+        .glass-shine {
+            position: absolute;
+            top: 10px;
+            left: 12px;
+            width: 18px;
+            height: 160px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.05) 100%);
+            border-radius: 10px;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* Glowing Goo Liquid */
+        .goo-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 82%;
+            background: linear-gradient(180deg, #39ff14 0%, #15803d 70%, #052e16 100%);
+            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.6), 0 0 25px #39ff14;
+        }
+
+        .goo-surface {
+            position: absolute;
+            top: -10px;
+            width: 100%;
+            height: 20px;
+            background: #4ade80;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #39ff14;
+        }
+
+        /* Animated Bubbles inside Goo */
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            box-shadow: 0 0 6px #fff;
+            animation: floatUp 3s infinite ease-in;
+        }
+
+        .b1 { width: 12px; height: 12px; left: 20%; bottom: 10px; animation-duration: 2.5s; }
+        .b2 { width: 18px; height: 18px; left: 60%; bottom: 5px; animation-duration: 3.8s; animation-delay: 0.5s; }
+        .b3 { width: 8px;  height: 8px;  left: 40%; bottom: 20px; animation-duration: 2.1s; animation-delay: 1.2s; }
+        .b4 { width: 14px; height: 14px; left: 75%; bottom: 15px; animation-duration: 3.1s; animation-delay: 0.2s; }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.8); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translateY(-130px) scale(1.2); opacity: 0; }
+        }
+
+        /* Jar Biohazard Label */
+        .jar-label {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 60px;
+            background: #facc15;
+            border: 2px solid #000;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: 900;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .biohazard { font-size: 1.2rem; line-height: 1; }
+        .label-text { font-size: 0.75rem; letter-spacing: 1px; }
+        .sub-label { font-size: 0.5rem; opacity: 0.8; }
+
+        /* Jar Base Shadow */
+        .jar-shadow {
+            position: absolute;
+            bottom: 5px;
+            width: 150px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            filter: blur(6px);
+            z-index: 1;
+        }
+
+        /* Stink Lines & Dynamic Effects */
+        .stink-line {
+            position: absolute;
+            stroke: #a3e635;
+            stroke-width: 4;
+            stroke-linecap: round;
+            fill: none;
+            opacity: 0;
+            pointer-events: none;
+            animation: riseStink 2s ease-out forwards;
+            filter: drop-shadow(0 0 6px #39ff14);
+        }
+
+        @keyframes riseStink {
+            0% { transform: translateY(0) scaleX(1); opacity: 0; }
+            30% { opacity: 0.8; }
+            100% { transform: translateY(-120px) scaleX(1.5); opacity: 0; }
+        }
+
+        /* Particle Splashes */
+        .particle {
+            position: absolute;
+            background: #39ff14;
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 8px #39ff14;
+            z-index: 20;
+        }
+
+        /* Sound Effect Pop-up Text */
+        .sound-popup {
+            position: absolute;
+            font-weight: 900;
+            font-size: 1.6rem;
+            color: #ccff00;
+            text-shadow: 0 0 10px #000, 2px 2px 0 #000, -2px -2px 0 #000;
+            pointer-events: none;
+            z-index: 30;
+            animation: popAndFloat 0.9s ease-out forwards;
+        }
+
+        @keyframes popAndFloat {
+            0% { transform: translate(-50%, -50%) scale(0.3) rotate(-10deg); opacity: 0; }
+            30% { transform: translate(-50%, -80%) scale(1.2) rotate(5deg); opacity: 1; }
+            100% { transform: translate(-50%, -140%) scale(1) rotate(0deg); opacity: 0; }
+        }
+
+        /* Instructions Footer */
+        .instructions {
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #d1d5db;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <header>
+            <h1>#FIAJ Fart in a Jar</h1>
+            <h2>Game by Warren Woodhouse. &copy;2026 <a href="https://warrenwoodhouse.blogspot.com/">Warren Woodhouse</a>.</h2>
+            <p class="subtext">Press the squishy jar to release toxic farts!</p>
+        </header>
+
+        <!-- Stink Meter Display -->
+        <div class="stink-meter-container">
+            <div class="meter-info">
+                <span>STINK LEVEL:</span>
+                <span id="stink-status">FRESH</span>
+            </div>
+            <div class="meter-bar-bg">
+                <div id="meter-fill" class="meter-fill"></div>
+            </div>
+            <div class="stats">TOTAL FARTS RELEASED: <span id="fart-count">0</span></div>
+        </div>
+
+        <!-- Interactive Stage -->
+        <div class="jar-stage" id="stage">
+            <!-- Background Mist -->
+            <div class="mist-container">
+                <div class="mist mist-1"></div>
+                <div class="mist mist-2"></div>
+            </div>
+
+            <!-- Jar -->
+            <div class="jar" id="goo-jar">
+                <div class="lid">
+                    <div class="lid-stripe"></div>
+                </div>
+                <div class="glass-body">
+                    <div class="glass-shine"></div>
+                    <div class="goo-fill">
+                        <div class="goo-surface"></div>
+                        <div class="bubble b1"></div>
+                        <div class="bubble b2"></div>
+                        <div class="bubble b3"></div>
+                        <div class="bubble b4"></div>
+                    </div>
+                    <div class="jar-label">
+                        <span class="biohazard">☣</span>
+                        <span class="label-text">BIO-SLIME</span>
+                        <span class="sub-label">PRESS ME!</span>
+                    </div>
+                </div>
+            </div>
+            <div class="jar-shadow"></div>
+        </div>
+
+        <div class="instructions">🔊 Click or Tap the Jar to Play</div>
+    </div>
+
+    <script>
+        // Web Audio API Synthesizer (No external audio files needed!)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        // Pre-generate Noise Buffer for air/wet sound effects
+        let noiseBuffer = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+                
+                // Create 2 seconds of white noise
+                const bufferSize = audioCtx.sampleRate * 2;
+                noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1;
+                }
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Procedural Fart Synthesizer
+        function synthesizeFart() {
+            initAudio();
+            const now = audioCtx.currentTime;
+
+            // Pick a random fart profile (0 to 5)
+            const type = Math.floor(Math.random() * 6);
+
+            // Create Audio Nodes
+            const osc = audioCtx.createOscillator();
+            const oscGain = audioCtx.createGain();
+
+            const lfo = audioCtx.createOscillator();
+            const lfoGain = audioCtx.createGain();
+
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = noiseBuffer;
+            const noiseFilter = audioCtx.createBiquadFilter();
+            const noiseGain = audioCtx.createGain();
+
+            const masterFilter = audioCtx.createBiquadFilter();
+            const masterGain = audioCtx.createGain();
+
+            let duration = 0.5;
+            let label = "PFFFFT!";
+
+            // Connect LFO (Vibrato/Flutter for lip flapping effect)
+            lfo.connect(lfoGain);
+
+            // Sound Profiles
+            switch(type) {
+                case 0: // Wet Squelch
+                    label = "SQUELCH!";
+                    duration = 0.5 + Math.random() * 0.3;
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(110, now);
+                    osc.frequency.exponentialRampToValueAtTime(30, now + duration);
+
+                    lfo.frequency.setValueAtTime(22, now);
+                    lfoGain.gain.setValueAtTime(40, now);
+                    lfo.connect(osc.frequency);
+
+                    noiseFilter.type = 'bandpass';
+                    noiseFilter.frequency.setValueAtTime(800, now);
+                    noiseGain.gain.setValueAtTime(0.4, now);
+                    noiseGain.gain.exponentialRampToValueAtTime(0.01, now + duration);
+
+                    masterFilter.type = 'lowpass';
+                    masterFilter.frequency.setValueAtTime(1000, now);
+                    break;
+
+                case 1: // High Squeaker
+                    label = "SQUEEEEK!";
+                    duration = 0.3 + Math.random() * 0.2;
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(320, now);
+                    osc.frequency.exponentialRampToValueAtTime(70, now + duration);
+
+                    lfo.frequency.setValueAtTime(35, now);
+                    lfoGain.gain.setValueAtTime(20, now);
+                    lfo.connect(osc.frequency);
+
+                    noiseGain.gain.setValueAtTime(0.05, now);
+
+                    masterFilter.type = 'lowpass';
+                    masterFilter.frequency.setValueAtTime(1800, now);
+                    break;
+
+                case 2: // The Monster Rip
+                    label = "BRAAAT!!";
+                    duration = 0.8 + Math.random() * 0.4;
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(130, now);
+                    osc.frequency.linearRampToValueAtTime(45, now + duration);
+
+                    lfo.type = 'sawtooth';
+                    lfo.frequency.setValueAtTime(16, now);
+                    lfoGain.gain.setValueAtTime(0.5, now);
+                    lfo.connect(masterGain.gain); // Tremolo effect
+
+                    noiseFilter.type = 'lowpass';
+                    noiseFilter.frequency.setValueAtTime(500, now);
+                    noiseGain.gain.setValueAtTime(0.3, now);
+
+                    masterFilter.type = 'lowpass';
+                    masterFilter.frequency.setValueAtTime(1400, now);
+                    break;
+
+                case 3: // Bubble Burst / Wet Pop
+                    label = "PLOP-SPLRT!";
+                    duration = 0.4 + Math.random() * 0.2;
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.setValueAtTime(60, now + 0.08);
+                    osc.frequency.exponentialRampToValueAtTime(25, now + duration);
+
+                    lfo.frequency.setValueAtTime(30, now);
+                    lfoGain.gain.setValueAtTime(50, now);
+                    lfo.connect(osc.frequency);
+
+                    noiseGain.gain.setValueAtTime(0.3, now);
+
+                    masterFilter.type = 'bandpass';
+                    masterFilter.frequency.setValueAtTime(600, now);
+                    break;
+
+                case 4: // Deep Rumble
+                    label = "GRUUUUMBLE...";
+                    duration = 1.1 + Math.random() * 0.5;
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(65, now);
+                    osc.frequency.linearRampToValueAtTime(25, now + duration);
+
+                    lfo.frequency.setValueAtTime(12, now);
+                    lfoGain.gain.setValueAtTime(25, now);
+                    lfo.connect(osc.frequency);
+
+                    noiseFilter.type = 'lowpass';
+                    noiseFilter.frequency.setValueAtTime(250, now);
+                    noiseGain.gain.setValueAtTime(0.25, now);
+
+                    masterFilter.type = 'lowpass';
+                    masterFilter.frequency.setValueAtTime(450, now);
+                    break;
+
+                case 5: // Wet Slime Burst
+                    label = "SPLURRRTT!";
+                    duration = 0.6 + Math.random() * 0.3;
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(35, now + duration);
+
+                    lfo.frequency.setValueAtTime(28, now);
+                    lfoGain.gain.setValueAtTime(60, now);
+                    lfo.connect(osc.frequency);
+
+                    noiseFilter.type = 'highpass';
+                    noiseFilter.frequency.setValueAtTime(500, now);
+                    noiseGain.gain.setValueAtTime(0.5, now);
+
+                    masterFilter.type = 'lowpass';
+                    masterFilter.frequency.setValueAtTime(1200, now);
+                    break;
+            }
+
+            // Envelope Setup
+            masterGain.gain.setValueAtTime(0.01, now);
+            masterGain.gain.linearRampToValueAtTime(0.8, now + 0.03);
+            masterGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+            // Connect Nodes
+            osc.connect(oscGain);
+            oscGain.connect(masterFilter);
+
+            noise.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(masterFilter);
+
+            masterFilter.connect(masterGain);
+            masterGain.connect(audioCtx.destination);
+
+            // Play
+            osc.start(now);
+            lfo.start(now);
+            noise.start(now);
+
+            osc.stop(now + duration);
+            lfo.stop(now + duration);
+            noise.stop(now + duration);
+
+            return label;
+        }
+
+        // Game State Variables
+        let fartCount = 0;
+        let stinkLevel = 0;
+
+        const jar = document.getElementById('goo-jar');
+        const stage = document.getElementById('stage');
+        const fartCountEl = document.getElementById('fart-count');
+        const meterFillEl = document.getElementById('meter-fill');
+        const stinkStatusEl = document.getElementById('stink-status');
+
+        // Status Titles
+        const statusLevels = [
+            { min: 0, text: "FRESH", color: "#86efac" },
+            { min: 5, text: "SMELLY", color: "#facc15" },
+            { min: 15, text: "FUNKY", color: "#f97316" },
+            { min: 30, text: "TOXIC ☣", color: "#ef4444" },
+            { min: 50, text: "BIOHAZARD!", color: "#a855f7" },
+            { min: 75, text: "NUCLEAR STINK!!", color: "#39ff14" }
+        ];
+
+        // Jar Press Event Handler
+        function pressJar(e) {
+            e.preventDefault();
+
+            // Visual Squish Effect
+            jar.classList.remove('squish');
+            void jar.offsetWidth; // Trigger reflow
+            jar.classList.add('squish');
+
+            // Play Sound & Get Text
+            const soundText = synthesizeFart();
+
+            // Get click/touch location for particles
+            const rect = jar.getBoundingClientRect();
+            const clickX = (e.clientX || (e.touches && e.touches[0].clientX) || (rect.left + rect.width / 2)) - rect.left;
+            const clickY = (e.clientY || (e.touches && e.touches[0].clientY) || (rect.top + rect.height / 2)) - rect.top;
+
+            // Spawn Visual Effects
+            spawnSoundText(soundText, rect.left + clickX, rect.top + clickY);
+            spawnGooSplatter(rect.left + clickX, rect.top + clickY);
+            spawnStinkLine();
+
+            // Update Game State
+            fartCount++;
+            stinkLevel = Math.min(stinkLevel + 4, 100);
+            
+            updateUI();
+        }
+
+        // Spawn Floating Text Effect
+        function spawnSoundText(text, x, y) {
+            const el = document.createElement('div');
+            el.className = 'sound-popup';
+            el.innerText = text;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            document.body.appendChild(el);
+
+            setTimeout(() => el.remove(), 900);
+        }
+
+        // Spawn Goo Splash Particles
+        function spawnGooSplatter(originX, originY) {
+            const count = 10;
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                const size = Math.random() * 8 + 6;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = originX + 'px';
+                particle.style.top = originY + 'px';
+
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 80 + 40;
+                const vx = Math.cos(angle) * speed;
+                const vy = Math.sin(angle) * speed;
+
+                document.body.appendChild(particle);
+
+                particle.animate([
+                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                    { transform: `translate(${vx}px, ${vy + 50}px) scale(0)`, opacity: 0 }
+                ], {
+                    duration: 600 + Math.random() * 300,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                }).onfinish = () => particle.remove();
+            }
+        }
+
+        // Spawn Wavy SVG Stink Lines
+        function spawnStinkLine() {
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("class", "stink-line");
+            svg.setAttribute("viewBox", "0 0 40 80");
+            svg.style.width = "40px";
+            svg.style.height = "80px";
+
+            // Random offset relative to jar
+            const randomX = (Math.random() - 0.5) * 100;
+            svg.style.left = `calc(50% + ${randomX}px)`;
+            svg.style.top = "20px";
+
+            const path = document.createElementNS(svgNS, "path");
+            path.setAttribute("d", "M 20 80 Q 35 60 20 40 T 20 0");
+            svg.appendChild(path);
+
+            stage.appendChild(svg);
+            setTimeout(() => svg.remove(), 2000);
+        }
+
+        // Update Stink Meter and UI
+        function updateUI() {
+            fartCountEl.innerText = fartCount;
+            meterFillEl.style.width = stinkLevel + '%';
+
+            // Find matching stink status
+            let currentStatus = statusLevels[0];
+            for (let i = statusLevels.length - 1; i >= 0; i--) {
+                if (fartCount >= statusLevels[i].min) {
+                    currentStatus = statusLevels[i];
+                    break;
+                }
+            }
+
+            stinkStatusEl.innerText = currentStatus.text;
+            stinkStatusEl.style.color = currentStatus.color;
+        }
+
+        // Stink Decay over time
+        setInterval(() => {
+            if (stinkLevel > 0) {
+                stinkLevel = Math.max(0, stinkLevel - 1);
+                meterFillEl.style.width = stinkLevel + '%';
+            }
+        }, 300);
+
+        // Event Listeners
+        jar.addEventListener('mousedown', pressJar);
+        jar.addEventListener('touchstart', pressJar, { passive: false });
+    </script>
+</body>
+</html>
