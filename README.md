@@ -37,13 +37,13 @@ Games, Apps and Mods by GotGames Interactive.
 * Meerkat in a Poncho (coming soon)
 
 ## horror games
-* Darkness in Room 943 (coming soon)
+* [Darkness in Room 943](https://warrenwoodhouse.github.io/games/darknessinroom943) (coming soon)
 
 ## text adventure games
 * Daft Freak & Friends (remade as “Smells Like Tuesday” by Charlie Birks of Daft Games)
 
 ## sci-fi games
-* Quantum Jumper (coming soon)
+* [Quantum Jumper](https://warrenwoodhouse.github.io/games/quantumjumper) (coming soon)
 
 # texture packs
 * [Newcastle upon Tyne UK’s Metro Reskin for the Liberty City Subway on Grand Theft Auto III](https://github.com/warrenwoodhouse/gta3/releases/tag/newcastleupontyneuknexusmetrotexturepack)
