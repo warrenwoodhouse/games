@@ -26,12 +26,19 @@ Founded: 19th October 2001
 Games, Apps and Mods by GotGames Interactive.
 
 ## browser games
-* [Simplified Caravan](https://warrenwoodhouse.github.io/games/caravancardgame): This free simplified version of the infamous fictional Caravan Card Game from Fallout: New Vegas. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
-* [Advanced Draughts (Checkers)](https://warrenwoodhouse.github.io/games/draughts): This free advanced version of the classic Draughts game lets you play with an AI bot or with a local player. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
-* [#FIAJ Fart in a Jar](https://warrenwoodhouse.github.io/games/fartinajar): This free game lets you tap a smelly jar that releases toxic odours with smelly and loud noises! See how many taps you can get! Can you create the highest score? Available to play directly in your browser. Built using HTML, CSS, SVG, MIDI and JavaScript.
+Check out the various categories below to find games that are available to play in your browser.
 
-## other games
-* [Twisty Cube](https://warrenwoodhouse.github.io/games/twistycube): Free mock version of the Rubik Cube as a player. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
+## card games
+* ![logo](https://raw.githubusercontent.com/warrenwoodhouse/logos/refs/heads/main/logos-simplifiedcaravan-small.png) [Simplified Caravan](https://warrenwoodhouse.github.io/games/caravancardgame): This free simplified version of the infamous fictional Caravan Card Game from Fallout: New Vegas. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
+
+## board games
+* ![logo](https://raw.githubusercontent.com/warrenwoodhouse/logos/refs/heads/main/logos-draughts-small.png) [Advanced Draughts (Checkers)](https://warrenwoodhouse.github.io/games/draughts): This free advanced version of the classic Draughts game lets you play with an AI bot or with a local player. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
+
+## clicking games
+* ![logo](https://raw.githubusercontent.com/warrenwoodhouse/logos/refs/heads/main/logos-fiaj-small.png) [#FIAJ Fart in a Jar](https://warrenwoodhouse.github.io/games/fartinajar): This free game lets you tap a smelly jar that releases toxic odours with smelly and loud noises! See how many taps you can get! Can you create the highest score? Available to play directly in your browser. Built using HTML, CSS, SVG, MIDI and JavaScript.
+
+## puzzle games
+* [Twisty Cube](https://warrenwoodhouse.github.io/games/twistycube): Free version of the Rubik Cube. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
 
 ## walking simulation games
 * Meerkat in a Poncho (coming soon)
