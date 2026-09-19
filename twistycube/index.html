@@ -1,13 +1,106 @@
 <html>
 <head>
   <meta charset="UTF-8">
+
+<!-- ICONS META DATA -->
+<link rel="icon" href="https://raw.githubusercontent.com/warrenwoodhouse/favicons/main/twistycube.ico" type="image/ico"/>
+<link rel="shortcut icon" href="https://raw.githubusercontent.com/warrenwoodhouse/favicons/main/twistycube.ico" type="image/ico"/>
+
+<!-- OPENGRAPH META DATA -->
+<meta name="og:title" content="Twisty Cube - GotGames Interactive - Warren Woodhouse">
+<meta name="og:type" content="application">
+<meta name="og:url" content="https://warrenwoodhouse.github.io/games/twistycube">
+<meta name="og:image" content="https://raw.githubusercontent.com/warrenwoodhouse/favicons/main/twistycube.ico">
+<meta name="og:site_name" content="Twisty Cube - GotGames Interactive - Warren Woodhouse">
+<meta name="og:description" content="A fun interactive minigame that features the Rubik’s Cube.">
+<script type="application/ld+json">{"@context":"https://schema.org/","@type":"Video Game","name":"Twisty Cube - GotGames Interactive - Warren Woodhouse","url":"https://warrenwoodhouse.github.io/games/draughts"}</script>
+
+<!-- APPLE META DATA -->
+<meta name="apple-mobile-web-app-title" content="Twisty Cube">
+<!-- New in iOS6 -->
+<link rel="apple-mobile-web-app" href="https://warrenwoodhouse.github.io/games/twistycube">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="mask-icon" href="https://raw.githubusercontent.com/warrenwoodhouse/favicons/main/twistycube.ico" color="#0755aa">
+<meta name="theme-color" content="#0755aa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#090909" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="https://raw.githubusercontent.com/warrenwoodhouse/warrenwoodhouse/master/site/site.webmanifest" crossorigin="use-credentials" id="manifest-link" />
+<link rel="icon" type="image/ico" href="https://raw.githubusercontent.com/warrenwoodhouse/favicons/main/twistycube.ico" sizes="96x96" />
+<meta name="apple-mobile-web-app-status-bar-style" content="#0755aa">
+<meta name="apple-touch-fullscreen" content="yes">
+<link href="https://raw.githubusercontent.com/warrenwoodhouse/favicons/main/twistycube.ico" rel="apple-touch-icon" type="image/ico">
+<link href="https://raw.githubusercontent.com/warrenwoodhouse/favicons/main/twistycube.ico" rel="apple-ipad-icon" type="image/ico" sizes="72x72">
+<link href="https://raw.githubusercontent.com/warrenwoodhouse/favicons/main/twistycube.ico" rel="apple-touch-startup-image" type="image/ico" sizes="152x152">
+<link rel="mask-icon" href="https://raw.githubusercontent.com/warrenwoodhouse/favicons/main/twistycube.ico" type="image/ico"/>
+
+<!-- MICROSOFT META DATA -->
+<meta name="mssmarttagspreventparsing" content="true">
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+<meta name="msapplication-starturl" content="https://warrenwoodhouse.github.io/games/twistycube">
+<meta name="msapplication-window" content="width=800;height=600">
+<meta name="msapplication-navbutton-color" content="#0755aa">
+<meta name="application-name" content="Twisty Cube">
+<meta name="msapplication-tooltip" content="A fun interactive minigame that features the Rubik’s Cube.">
+<meta name="msapplication-task" content="name=About;action-uri=https://warrenwoodhouse.blogspot.com/p/about.html;icon-uri=https://warrenwoodhouse.blogspot.com/favicon.ico">
+<meta name="news_keywords" content="cube, Twisty Cube, Rubik's Cube, clicking games, #warrenwoodhouse, warrenwoodhouse, Warren Woodhouse, gaming, games, free, free to play, browser games">
+  
   <title>Twisty Cube - GotGames Interactive - Warren Woodhouse</title>
+  <meta name="description" content="A fun interactive minigame that features the Rubik’s Cube.">
+  <meta name="keywords" content="cube, Twisty Cube, Rubik's Cube, clicking games, #warrenwoodhouse, warrenwoodhouse, Warren Woodhouse, gaming, games, free, free to play, browser games">
   
   <!-- 1. Load the cubing.js twisty player module -->
   <script type="module" src="https://cdn.cubing.net/v0/js/cubing/twisty"></script>
   
   <style>
-    /* 2. Set the size of your cube container */
+        /* 2. Box UI */
+        *  {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* 3. Body UI */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: radial-gradient(circle at center, #ffffff 95%, #090909 5%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* 4. Header UI */
+        header {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            color: #000000;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            margin: 5px 0 0 0;
+            font-size: 1.5rem;
+            color: #000000;
+            letter-spacing: 2px;
+        }
+
+        .subtext {
+            margin: 5px 0 0 0;
+            font-size: 0.95rem;
+            color: #000000;
+            letter-spacing: 2px;
+        }
+    
+    /* 5. Set the size of your cube container */
     .cube-container {
       width: 400px; 
       height: 400px;
@@ -16,12 +109,14 @@
   </style>
 </head>
 <body>
-    <h1>Twisty Cube</h1>
+  <header>
+    <h1><a href="https://warrenwoodhouse.github.io/games/twistycube"><img src="https://raw.githubusercontent.com/warrenwoodhouse/logos/main/logos-twistycube-small.png"></a></h1>
     <h2>Game by Warren Woodhouse. Original code &copy;2026 <a href="https://warrenwoodhouse.blogspot.com/">Warren Woodhouse</a>. Built using: Cubing API. Rubik’s Cube is a registered trademark of The Rubik’s Company.</h2>
-    <h3>A fun interactive minigame that features the Rubik’s Cube.</h3>
-
+    <p class="subtext">A fun interactive minigame that features the Rubik’s Cube.</p>
+  </header>
+  
   <div class="cube-container">
-    <!-- 3. Add the cube to your page -->
+    <!-- 6. Add the cube to your page -->
     <twisty-player 
       puzzle="3x3x3" 
       alg="R U R' U R U2 R'" 
