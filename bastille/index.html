@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bastille</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Campaign</div>
+          <h1 id="missionTitle">Uprising</h1>
+        </div>
+        <div>
+          <div class="eyebrow">Objective</div>
+          <div id="objectiveText">Reach the gate and open the bastion.</div>
+        </div>
+      </header>
+
+      <main class="game-layout">
+        <section class="game-panel">
+          <canvas id="gameCanvas" width="640" height="480"></canvas>
+        </section>
+
+        <aside class="sidebar">
+          <div class="panel">
+            <h2>Story</h2>
+            <p id="storyText">The city waits in silence beneath the Bastille walls.</p>
+          </div>
+
+          <div class="panel stats-panel">
+            <h2>Stats</h2>
+            <ul>
+              <li>Health: <span id="healthValue">100</span></li>
+              <li>Ammo: <span id="ammoValue">8</span></li>
+              <li>Objective: <span id="goalValue">Courtyard</span></li>
+            </ul>
+          </div>
+
+          <div class="panel controls-panel">
+            <h2>Controls</h2>
+            <p>Move: WASD / Arrow Keys</p>
+            <p>Interact: E</p>
+            <p>Shoot: Space</p>
+            <div class="button-row">
+              <button id="saveBtn">Save</button>
+              <button id="loadBtn">Load</button>
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <div id="dialogueBox" class="dialogue hidden">
+      <div id="dialogueText">No active dialogue.</div>
+      <button id="dialogueClose">Close</button>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
