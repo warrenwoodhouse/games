@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Pong Game</title>
     <style>
         * {
@@ -18,6 +18,10 @@
             min-height: 100vh;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
         }
 
         .container {
@@ -25,6 +29,8 @@
             flex-direction: column;
             align-items: center;
             gap: 20px;
+            width: 100%;
+            padding: 10px;
         }
 
         h1 {
@@ -39,6 +45,10 @@
             background-color: #000;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             cursor: none;
+            touch-action: none;
+            display: block;
+            max-width: 100%;
+            height: auto;
         }
 
         .scoreboard {
@@ -97,33 +107,99 @@
             margin-bottom: 5px;
         }
 
-        @media (max-width: 600px) {
+        .mobile-controls {
+            display: none;
+            gap: 15px;
+            justify-content: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .control-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 15px 25px;
+            font-size: 1.2em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            font-weight: bold;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .control-button:active {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: scale(0.95);
+        }
+
+        .control-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.7);
+        }
+
+        @media (max-width: 768px) {
             h1 {
                 font-size: 1.8em;
+                margin-bottom: 5px;
             }
 
             #gameCanvas {
-                width: 100%;
-                max-width: 95vw;
+                width: 95vw;
+                max-width: 600px;
                 height: auto;
             }
 
             .scoreboard {
                 width: 90vw;
-                max-width: 400px;
+                max-width: 300px;
+                font-size: 1.2em;
             }
 
             .instructions {
                 width: 90vw;
                 max-width: 400px;
-                font-size: 0.8em;
+                font-size: 0.75em;
+            }
+
+            .mobile-controls {
+                display: flex;
+            }
+
+            .container {
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .scoreboard {
+                width: 85vw;
+                padding: 10px;
+            }
+
+            .score-value {
+                font-size: 1.5em;
+            }
+
+            .instructions {
+                width: 85vw;
+                font-size: 0.7em;
+                padding: 10px 15px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🏓 Pong Game</h1>
+        <h1>🏓 Pong</h1>
         
         <div class="scoreboard">
             <div class="score-section">
@@ -138,13 +214,18 @@
 
         <canvas id="gameCanvas" width="800" height="400"></canvas>
 
+        <div class="mobile-controls">
+            <button class="control-button" id="upButton">⬆️ UP</button>
+            <button class="control-button" id="downButton">⬇️ DOWN</button>
+        </div>
+
         <div class="instructions">
             <p><strong>How to Play:</strong></p>
             <ul class="controls-list">
+                <li>📱 <strong>Touch</strong> - Move paddle on mobile</li>
                 <li>🖱️ <strong>Mouse</strong> - Move left paddle vertically</li>
                 <li>⬆️⬇️ <strong>Arrow Keys</strong> - Move left paddle up/down</li>
                 <li>🤖 Computer controls the right paddle</li>
-                <li>First to score wins!</li>
             </ul>
         </div>
     </div>
@@ -191,8 +272,19 @@
 
         let keysPressed = {};
         let mouseY = canvas.height / 2;
+        let touchY = canvas.height / 2;
+        let mobileUpPressed = false;
+        let mobileDownPressed = false;
+        let isMobileDevice = window.innerWidth <= 768;
 
-        // Event listeners
+        // Detect mobile device
+        function checkMobileDevice() {
+            isMobileDevice = window.innerWidth <= 768;
+        }
+
+        window.addEventListener('resize', checkMobileDevice);
+
+        // Event listeners for keyboard
         window.addEventListener('keydown', (e) => {
             keysPressed[e.key] = true;
         });
@@ -201,18 +293,95 @@
             keysPressed[e.key] = false;
         });
 
+        // Event listeners for mouse
         document.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
             mouseY = e.clientY - rect.top;
         });
 
+        // Event listeners for touch
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            touchY = touch.clientY - rect.top;
+        }, { passive: false });
+
+        document.addEventListener('touchend', (e) => {
+            // Reset touch position when touch ends
+            touchY = canvas.height / 2;
+        });
+
+        // Mobile button controls
+        const upButton = document.getElementById('upButton');
+        const downButton = document.getElementById('downButton');
+
+        if (upButton) {
+            upButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                mobileUpPressed = true;
+            });
+
+            upButton.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                mobileUpPressed = false;
+            });
+
+            upButton.addEventListener('mousedown', () => {
+                mobileUpPressed = true;
+            });
+
+            upButton.addEventListener('mouseup', () => {
+                mobileUpPressed = false;
+            });
+        }
+
+        if (downButton) {
+            downButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                mobileDownPressed = true;
+            });
+
+            downButton.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                mobileDownPressed = false;
+            });
+
+            downButton.addEventListener('mousedown', () => {
+                mobileDownPressed = true;
+            });
+
+            downButton.addEventListener('mouseup', () => {
+                mobileDownPressed = false;
+            });
+        }
+
         // Update player position based on input
         function updatePlayer() {
-            // Mouse control
-            if (mouseY < player.y + paddleHeight / 2) {
+            // Touch control for mobile (swiping on canvas)
+            if (isMobileDevice && touchY !== canvas.height / 2) {
+                if (touchY < player.y + paddleHeight / 2) {
+                    player.y -= player.speed;
+                } else if (touchY > player.y + paddleHeight / 2) {
+                    player.y += player.speed;
+                }
+            }
+
+            // Mobile button controls
+            if (mobileUpPressed) {
                 player.y -= player.speed;
-            } else if (mouseY > player.y + paddleHeight / 2) {
+            }
+            if (mobileDownPressed) {
                 player.y += player.speed;
+            }
+
+            // Mouse control (desktop)
+            if (!isMobileDevice) {
+                if (mouseY < player.y + paddleHeight / 2) {
+                    player.y -= player.speed;
+                } else if (mouseY > player.y + paddleHeight / 2) {
+                    player.y += player.speed;
+                }
             }
 
             // Keyboard control
