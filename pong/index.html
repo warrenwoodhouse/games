@@ -28,7 +28,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             width: 100%;
             padding: 10px;
         }
@@ -37,25 +37,27 @@
             color: white;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             font-size: 2.5em;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
-        .difficulty-panel {
+        .panel {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
             justify-content: center;
             background: rgba(0, 0, 0, 0.25);
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px 12px;
             box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
         }
 
-        .difficulty-btn {
+        .difficulty-btn,
+        .match-btn,
+        .reset-btn {
             background: rgba(255, 255, 255, 0.15);
             border: 2px solid rgba(255, 255, 255, 0.35);
             color: white;
-            padding: 10px 18px;
+            padding: 10px 16px;
             border-radius: 999px;
             cursor: pointer;
             font-weight: bold;
@@ -64,16 +66,35 @@
             min-width: 90px;
         }
 
-        .difficulty-btn.active {
+        .difficulty-btn.active,
+        .match-btn.active {
             background: #ffff00;
             color: #111;
             border-color: #ffff00;
             box-shadow: 0 0 12px rgba(255, 255, 0, 0.6);
         }
 
-        .difficulty-btn:hover {
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.22);
+            min-width: 120px;
+        }
+
+        .difficulty-btn:hover,
+        .match-btn:hover,
+        .reset-btn:hover {
             transform: translateY(-1px);
             background: rgba(255, 255, 255, 0.25);
+        }
+
+        .status {
+            color: white;
+            font-size: 0.9em;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 999px;
+            padding: 8px 14px;
+            min-width: 220px;
+            text-align: center;
         }
 
         #gameCanvas {
@@ -97,7 +118,7 @@
             background: rgba(0, 0, 0, 0.3);
             padding: 15px;
             border-radius: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .score-section {
@@ -181,7 +202,6 @@
         @media (max-width: 768px) {
             h1 {
                 font-size: 1.8em;
-                margin-bottom: 5px;
             }
 
             #gameCanvas {
@@ -237,11 +257,20 @@
     <div class="container">
         <h1>🏓 Pong</h1>
 
-        <div class="difficulty-panel" aria-label="Difficulty selector">
+        <div class="panel" aria-label="Difficulty selector">
             <button class="difficulty-btn" data-difficulty="easy">Easy</button>
             <button class="difficulty-btn active" data-difficulty="medium">Medium</button>
             <button class="difficulty-btn" data-difficulty="hard">Hard</button>
         </div>
+
+        <div class="panel" aria-label="Match length selector">
+            <button class="match-btn" data-bestof="3">Best of 3</button>
+            <button class="match-btn active" data-bestof="5">Best of 5</button>
+            <button class="match-btn" data-bestof="7">Best of 7</button>
+            <button class="reset-btn" id="resetButton">Reset Match</button>
+        </div>
+
+        <div class="status" id="statusText">Best of 5 • First to 3</div>
         
         <div class="scoreboard">
             <div class="score-section">
@@ -275,8 +304,8 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const statusText = document.getElementById('statusText');
 
-        // Game objects
         const paddleWidth = 10;
         const paddleHeight = 80;
         const ballSize = 8;
@@ -286,28 +315,31 @@
             easy: {
                 computerSpeed: 2.3,
                 trackingDeadZone: 85,
-                ballSpeed: 4.6
+                ballSpeed: 4.6,
+                reaction: 0.18,
+                intensity: 0.9
             },
             medium: {
                 computerSpeed: 2.8,
                 trackingDeadZone: 60,
-                ballSpeed: 5.2
+                ballSpeed: 5.2,
+                reaction: 0.12,
+                intensity: 1.1
             },
             hard: {
                 computerSpeed: 3.6,
                 trackingDeadZone: 35,
-                ballSpeed: 5.8
+                ballSpeed: 5.8,
+                reaction: 0.08,
+                intensity: 1.35
             }
         };
-
-        let currentDifficulty = 'medium';
 
         const player = {
             x: 10,
             y: canvas.height / 2 - paddleHeight / 2,
             width: paddleWidth,
             height: paddleHeight,
-            dy: 0,
             score: 0,
             speed: paddleSpeed
         };
@@ -317,10 +349,21 @@
             y: canvas.height / 2 - paddleHeight / 2,
             width: paddleWidth,
             height: paddleHeight,
-            dy: 0,
             score: 0,
-            speed: difficultySettings[currentDifficulty].computerSpeed
+            speed: difficultySettings.medium.computerSpeed,
+            targetY: canvas.height / 2,
+            smoothing: 0.12
         };
+
+        let currentDifficulty = 'medium';
+        let bestOf = 5;
+        let matchTarget = 3;
+        let keysPressed = {};
+        let mouseY = canvas.height / 2;
+        let touchY = canvas.height / 2;
+        let mobileUpPressed = false;
+        let mobileDownPressed = false;
+        let isMobileDevice = window.innerWidth <= 768;
 
         const ball = {
             x: canvas.width / 2,
@@ -331,17 +374,26 @@
             speed: difficultySettings[currentDifficulty].ballSpeed
         };
 
-        let keysPressed = {};
-        let mouseY = canvas.height / 2;
-        let touchY = canvas.height / 2;
-        let mobileUpPressed = false;
-        let mobileDownPressed = false;
-        let isMobileDevice = window.innerWidth <= 768;
+        function clamp(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
+
+        function setMatchLength(value) {
+            bestOf = Number(value);
+            matchTarget = Math.ceil(bestOf / 2);
+            statusText.textContent = `Best of ${bestOf} • First to ${matchTarget}`;
+            resetScores();
+        }
+
+        function updateStatus(text) {
+            statusText.textContent = text;
+        }
 
         function applyDifficulty(level) {
             currentDifficulty = level;
             const settings = difficultySettings[level];
             computer.speed = settings.computerSpeed;
+            computer.smoothing = settings.reaction;
             ball.speed = settings.ballSpeed;
             ball.dx = (Math.random() > 0.5 ? 1 : -1) * ball.speed;
             ball.dy = (Math.random() * 2 - 1) * ball.speed;
@@ -351,38 +403,232 @@
             });
         }
 
+        function resetScores() {
+            player.score = 0;
+            computer.score = 0;
+            updateScore();
+            resetBall();
+        }
+
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.dx = (Math.random() > 0.5 ? 1 : -1) * ball.speed;
+            ball.dy = (Math.random() * 2 - 1) * ball.speed;
+        }
+
+        function updateScore() {
+            document.getElementById('playerScore').textContent = player.score;
+            document.getElementById('computerScore').textContent = computer.score;
+        }
+
+        function isMatchWinner() {
+            return player.score >= matchTarget || computer.score >= matchTarget;
+        }
+
+        function handlePointScored(winner) {
+            const label = winner === 'player' ? 'Player' : 'Computer';
+            updateStatus(`Best of ${bestOf} • ${label} wins the point`);
+
+            if (isMatchWinner()) {
+                const winnerLabel = player.score >= matchTarget ? 'Player' : 'Computer';
+                updateStatus(`Best of ${bestOf} • ${winnerLabel} wins the match!`);
+                setTimeout(() => {
+                    player.score = 0;
+                    computer.score = 0;
+                    updateScore();
+                    resetBall();
+                    updateStatus(`Best of ${bestOf} • First to ${matchTarget}`);
+                }, 1200);
+                return;
+            }
+        }
+
+        function getComputerTargetY() {
+            let targetY = ball.y;
+
+            if (ball.dx > 0) {
+                const distanceToComputer = computer.x - ball.x;
+                const travelTime = distanceToComputer / Math.abs(ball.dx);
+                let predictedY = ball.y + (ball.dy * travelTime);
+
+                while (predictedY < 0 || predictedY > canvas.height) {
+                    if (predictedY < 0) {
+                        predictedY = Math.abs(predictedY);
+                    } else if (predictedY > canvas.height) {
+                        predictedY = canvas.height - (predictedY - canvas.height);
+                    }
+                }
+
+                targetY = predictedY;
+            }
+
+            return clamp(targetY, paddleHeight / 2, canvas.height - paddleHeight / 2);
+        }
+
+        function updatePlayer() {
+            if (isMobileDevice && touchY !== canvas.height / 2) {
+                if (touchY < player.y + paddleHeight / 2) {
+                    player.y -= player.speed;
+                } else if (touchY > player.y + paddleHeight / 2) {
+                    player.y += player.speed;
+                }
+            }
+
+            if (mobileUpPressed) player.y -= player.speed;
+            if (mobileDownPressed) player.y += player.speed;
+
+            if (!isMobileDevice) {
+                if (mouseY < player.y + paddleHeight / 2) {
+                    player.y -= player.speed;
+                } else if (mouseY > player.y + paddleHeight / 2) {
+                    player.y += player.speed;
+                }
+            }
+
+            if (keysPressed['ArrowUp']) player.y -= player.speed;
+            if (keysPressed['ArrowDown']) player.y += player.speed;
+
+            if (player.y < 0) player.y = 0;
+            if (player.y + player.height > canvas.height) {
+                player.y = canvas.height - player.height;
+            }
+        }
+
+        function updateComputer() {
+            const targetY = getComputerTargetY();
+            const center = computer.y + computer.height / 2;
+            const delta = targetY - center;
+            const movement = clamp(delta * computer.smoothing, -computer.speed, computer.speed);
+            computer.y += movement;
+
+            if (computer.y < 0) computer.y = 0;
+            if (computer.y + computer.height > canvas.height) {
+                computer.y = canvas.height - computer.height;
+            }
+        }
+
+        function updateBall() {
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            if (ball.y - ball.size < 0 || ball.y + ball.size > canvas.height) {
+                ball.dy = -ball.dy;
+                ball.y = clamp(ball.y, ball.size, canvas.height - ball.size);
+            }
+
+            if (
+                ball.x - ball.size < player.x + player.width &&
+                ball.y > player.y &&
+                ball.y < player.y + player.height
+            ) {
+                ball.dx = Math.abs(ball.dx);
+                const collidePoint = (ball.y - (player.y + player.height / 2)) / (player.height / 2);
+                ball.dy = collidePoint * ball.speed;
+                ball.x = player.x + player.width + ball.size;
+            }
+
+            if (
+                ball.x + ball.size > computer.x &&
+                ball.y > computer.y &&
+                ball.y < computer.y + computer.height
+            ) {
+                ball.dx = -Math.abs(ball.dx);
+                const collidePoint = (ball.y - (computer.y + computer.height / 2)) / (computer.height / 2);
+                ball.dy = collidePoint * ball.speed;
+                ball.x = computer.x - ball.size;
+            }
+
+            if (ball.x < 0) {
+                computer.score++;
+                updateScore();
+                handlePointScored('computer');
+                resetBall();
+            }
+
+            if (ball.x > canvas.width) {
+                player.score++;
+                updateScore();
+                handlePointScored('player');
+                resetBall();
+            }
+        }
+
+        function drawPaddle(paddle) {
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+        }
+
+        function drawBall() {
+            ctx.fillStyle = '#ffff00';
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawCenterLine() {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.setLineDash([10, 10]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function gameLoop() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawCenterLine();
+            drawPaddle(player);
+            drawPaddle(computer);
+            drawBall();
+
+            updatePlayer();
+            updateComputer();
+            updateBall();
+
+            requestAnimationFrame(gameLoop);
+        }
+
         document.querySelectorAll('.difficulty-btn').forEach((button) => {
             button.addEventListener('click', () => {
                 applyDifficulty(button.dataset.difficulty);
             });
         });
 
-        function checkMobileDevice() {
-            isMobileDevice = window.innerWidth <= 768;
-        }
-
-        window.addEventListener('resize', checkMobileDevice);
-
-        // Event listeners for keyboard
-        window.addEventListener('keydown', (e) => {
-            keysPressed[e.key] = true;
+        document.querySelectorAll('.match-btn').forEach((button) => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.match-btn').forEach((btn) => {
+                    btn.classList.toggle('active', btn === button);
+                });
+                setMatchLength(button.dataset.bestof);
+            });
         });
 
-        window.addEventListener('keyup', (e) => {
-            keysPressed[e.key] = false;
+        document.getElementById('resetButton').addEventListener('click', () => {
+            resetScores();
+            updateStatus(`Best of ${bestOf} • First to ${matchTarget}`);
         });
 
-        // Event listeners for mouse
-        document.addEventListener('mousemove', (e) => {
+        window.addEventListener('keydown', (event) => {
+            keysPressed[event.key] = true;
+        });
+
+        window.addEventListener('keyup', (event) => {
+            keysPressed[event.key] = false;
+        });
+
+        document.addEventListener('mousemove', (event) => {
             const rect = canvas.getBoundingClientRect();
-            mouseY = e.clientY - rect.top;
+            mouseY = event.clientY - rect.top;
         });
 
-        // Event listeners for touch
-        document.addEventListener('touchmove', (e) => {
-            e.preventDefault();
+        document.addEventListener('touchmove', (event) => {
+            event.preventDefault();
             const rect = canvas.getBoundingClientRect();
-            const touch = e.touches[0];
+            const touch = event.touches[0];
             touchY = touch.clientY - rect.top;
         }, { passive: false });
 
@@ -427,148 +673,13 @@
             });
         }
 
-        function updatePlayer() {
-            if (isMobileDevice && touchY !== canvas.height / 2) {
-                if (touchY < player.y + paddleHeight / 2) {
-                    player.y -= player.speed;
-                } else if (touchY > player.y + paddleHeight / 2) {
-                    player.y += player.speed;
-                }
-            }
-
-            if (mobileUpPressed) player.y -= player.speed;
-            if (mobileDownPressed) player.y += player.speed;
-
-            if (!isMobileDevice) {
-                if (mouseY < player.y + paddleHeight / 2) {
-                    player.y -= player.speed;
-                } else if (mouseY > player.y + paddleHeight / 2) {
-                    player.y += player.speed;
-                }
-            }
-
-            if (keysPressed['ArrowUp']) player.y -= player.speed;
-            if (keysPressed['ArrowDown']) player.y += player.speed;
-
-            if (player.y < 0) player.y = 0;
-            if (player.y + player.height > canvas.height) {
-                player.y = canvas.height - player.height;
-            }
-        }
-
-        function updateComputer() {
-            const computerCenter = computer.y + computer.height / 2;
-            const ballCenter = ball.y;
-            const deadZone = difficultySettings[currentDifficulty].trackingDeadZone;
-
-            if (computerCenter < ballCenter - deadZone) {
-                computer.y += computer.speed;
-            } else if (computerCenter > ballCenter + deadZone) {
-                computer.y -= computer.speed;
-            }
-
-            if (computer.y < 0) computer.y = 0;
-            if (computer.y + computer.height > canvas.height) {
-                computer.y = canvas.height - computer.height;
-            }
-        }
-
-        function updateBall() {
-            ball.x += ball.dx;
-            ball.y += ball.dy;
-
-            if (ball.y - ball.size < 0 || ball.y + ball.size > canvas.height) {
-                ball.dy = -ball.dy;
-                ball.y = Math.max(ball.size, Math.min(canvas.height - ball.size, ball.y));
-            }
-
-            if (
-                ball.x - ball.size < player.x + player.width &&
-                ball.y > player.y &&
-                ball.y < player.y + player.height
-            ) {
-                ball.dx = Math.abs(ball.dx);
-                let collidePoint = ball.y - (player.y + player.height / 2);
-                collidePoint = collidePoint / (player.height / 2);
-                ball.dy = collidePoint * ball.speed;
-                ball.x = player.x + player.width + ball.size;
-            }
-
-            if (
-                ball.x + ball.size > computer.x &&
-                ball.y > computer.y &&
-                ball.y < computer.y + computer.height
-            ) {
-                ball.dx = -Math.abs(ball.dx);
-                let collidePoint = ball.y - (computer.y + computer.height / 2);
-                collidePoint = collidePoint / (computer.height / 2);
-                ball.dy = collidePoint * ball.speed;
-                ball.x = computer.x - ball.size;
-            }
-
-            if (ball.x < 0) {
-                computer.score++;
-                resetBall();
-            }
-            if (ball.x > canvas.width) {
-                player.score++;
-                resetBall();
-            }
-
-            updateScore();
-        }
-
-        function resetBall() {
-            ball.x = canvas.width / 2;
-            ball.y = canvas.height / 2;
-            ball.dx = (Math.random() > 0.5 ? 1 : -1) * ball.speed;
-            ball.dy = (Math.random() * 2 - 1) * ball.speed;
-        }
-
-        function drawPaddle(paddle) {
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
-        }
-
-        function drawBall() {
-            ctx.fillStyle = '#ffff00';
-            ctx.beginPath();
-            ctx.arc(ball.x, ball.y, ball.size, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        function drawCenterLine() {
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.setLineDash([10, 10]);
-            ctx.beginPath();
-            ctx.moveTo(canvas.width / 2, 0);
-            ctx.lineTo(canvas.width / 2, canvas.height);
-            ctx.stroke();
-            ctx.setLineDash([]);
-        }
-
-        function updateScore() {
-            document.getElementById('playerScore').textContent = player.score;
-            document.getElementById('computerScore').textContent = computer.score;
-        }
-
-        function gameLoop() {
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            drawCenterLine();
-            drawPaddle(player);
-            drawPaddle(computer);
-            drawBall();
-
-            updatePlayer();
-            updateComputer();
-            updateBall();
-
-            requestAnimationFrame(gameLoop);
-        }
+        window.addEventListener('resize', () => {
+            isMobileDevice = window.innerWidth <= 768;
+        });
 
         applyDifficulty(currentDifficulty);
+        setMatchLength(bestOf);
+        updateScore();
         gameLoop();
     </script>
 </body>
