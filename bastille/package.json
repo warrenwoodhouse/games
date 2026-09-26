@@ -1,0 +1,13 @@
+{
+  "name": "bastille",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bastille browser game using HTML, CSS, JavaScript and REST API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
