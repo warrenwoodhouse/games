@@ -51,6 +51,11 @@ Check out the various categories below to find games that are available to play 
 
 ## sci-fi games
 * [Quantum Jumper](https://warrenwoodhouse.github.io/games/quantumjumper) (coming soon)
+* [Bastille](https://warrenwoodhouse.github.io/games/bastille)
+* [Bastille: Uprising](https://warrenwoodhouse.github.io/games/bastilleuprising) (TBA)
+
+## arcade games
+* [Pong](https://warrenwoodhouse.github.io/games/pong)
 
 # texture packs
 * [Newcastle upon Tyne UK’s Metro Reskin for the Liberty City Subway on Grand Theft Auto III](https://github.com/warrenwoodhouse/gta3/releases/tag/newcastleupontyneuknexusmetrotexturepack)
