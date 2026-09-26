@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bastille: Uprising</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="header-left">
+          <div class="eyebrow">Campaign</div>
+          <h1 id="levelTitle">Chapter I: Assembly at the Gate</h1>
+        </div>
+        <div class="header-center">
+          <div class="eyebrow">Location</div>
+          <div id="locationText">Outer Courtyard of the Bastille</div>
+        </div>
+        <div class="header-right">
+          <div class="eyebrow">Level</div>
+          <div id="levelNumber">1 / 4</div>
+        </div>
+      </header>
+
+      <main class="game-layout">
+        <section class="game-panel">
+          <canvas id="gameCanvas" width="800" height="600"></canvas>
+          <div class="canvas-info">
+            <span id="crosshair">+</span>
+          </div>
+        </section>
+
+        <aside class="sidebar">
+          <!-- Quest Log -->
+          <div class="panel quest-panel">
+            <h2>Active Quest</h2>
+            <div id="questContainer">
+              <div id="questTitle" class="quest-title">None</div>
+              <div id="questDesc" class="quest-desc">No active quests.</div>
+              <div id="questReward" class="quest-reward">Reward: -</div>
+            </div>
+          </div>
+
+          <!-- Inventory -->
+          <div class="panel inventory-panel">
+            <h2>Inventory</h2>
+            <div id="inventoryList" class="inventory-list"></div>
+          </div>
+
+          <!-- Health & Stats -->
+          <div class="panel stats-panel">
+            <h2>Status</h2>
+            <div class="stat-row">
+              <span>Health:</span>
+              <div id="healthBar" class="health-bar">
+                <div id="healthFill" class="health-fill"></div>
+              </div>
+              <span id="healthText">100/100</span>
+            </div>
+            <div class="stat-row">
+              <span>Ammo:</span>
+              <span id="ammoText">12 / 12</span>
+            </div>
+            <div class="stat-row">
+              <span>Kills:</span>
+              <span id="killsText">0</span>
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div class="panel controls-panel">
+            <h2>Controls</h2>
+            <p><strong>WASD</strong> - Move</p>
+            <p><strong>E</strong> - Interact</p>
+            <p><strong>Space</strong> - Fire</p>
+            <p><strong>M</strong> - Map</p>
+            <div class="button-row">
+              <button id="saveBtn">Save</button>
+              <button id="loadBtn">Load</button>
+              <button id="nextLevelBtn" class="hidden">Next Level</button>
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <!-- Dialogue Box -->
+    <div id="dialogueBox" class="dialogue hidden">
+      <div class="dialogue-speaker" id="dialogueSpeaker"></div>
+      <div class="dialogue-role" id="dialogueRole"></div>
+      <div id="dialogueText" class="dialogue-text"></div>
+      <button id="dialogueClose">Continue</button>
+    </div>
+
+    <!-- Quest Popup -->
+    <div id="questPopup" class="popup hidden">
+      <div class="popup-content">
+        <div class="popup-title" id="popupQuestTitle"></div>
+        <div class="popup-text" id="popupQuestText"></div>
+        <button id="acceptQuestBtn">Accept</button>
+      </div>
+    </div>
+
+    <!-- Map Modal -->
+    <div id="mapModal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Level Map</h2>
+        <canvas id="mapCanvas" width="400" height="400"></canvas>
+        <button id="closeMapBtn">Close Map</button>
+      </div>
+    </div>
+
+    <!-- Level Complete Modal -->
+    <div id="levelCompleteModal" class="modal hidden">
+      <div class="modal-content level-complete">
+        <h2 id="completeTitle">Level Complete!</h2>
+        <div id="completeStats"></div>
+        <button id="continueLevelBtn">Continue to Next Level</button>
+      </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>
