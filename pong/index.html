@@ -28,7 +28,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             width: 100%;
             padding: 10px;
         }
@@ -37,7 +37,43 @@
             color: white;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             font-size: 2.5em;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+        }
+
+        .difficulty-panel {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .difficulty-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95em;
+            transition: all 0.2s ease;
+            min-width: 90px;
+        }
+
+        .difficulty-btn.active {
+            background: #ffff00;
+            color: #111;
+            border-color: #ffff00;
+            box-shadow: 0 0 12px rgba(255, 255, 0, 0.6);
+        }
+
+        .difficulty-btn:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.25);
         }
 
         #gameCanvas {
@@ -200,6 +236,12 @@
 <body>
     <div class="container">
         <h1>🏓 Pong</h1>
+
+        <div class="difficulty-panel" aria-label="Difficulty selector">
+            <button class="difficulty-btn" data-difficulty="easy">Easy</button>
+            <button class="difficulty-btn active" data-difficulty="medium">Medium</button>
+            <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+        </div>
         
         <div class="scoreboard">
             <div class="score-section">
@@ -238,8 +280,27 @@
         const paddleWidth = 10;
         const paddleHeight = 80;
         const ballSize = 8;
-        const ballSpeed = 5;
         const paddleSpeed = 6;
+
+        const difficultySettings = {
+            easy: {
+                computerSpeed: 2.3,
+                trackingDeadZone: 85,
+                ballSpeed: 4.6
+            },
+            medium: {
+                computerSpeed: 2.8,
+                trackingDeadZone: 60,
+                ballSpeed: 5.2
+            },
+            hard: {
+                computerSpeed: 3.6,
+                trackingDeadZone: 35,
+                ballSpeed: 5.8
+            }
+        };
+
+        let currentDifficulty = 'medium';
 
         const player = {
             x: 10,
@@ -258,16 +319,16 @@
             height: paddleHeight,
             dy: 0,
             score: 0,
-            speed: 2.8  // Reduced from 4.5 - significantly slower
+            speed: difficultySettings[currentDifficulty].computerSpeed
         };
 
         const ball = {
             x: canvas.width / 2,
             y: canvas.height / 2,
-            dx: ballSpeed,
-            dy: ballSpeed,
+            dx: difficultySettings[currentDifficulty].ballSpeed,
+            dy: difficultySettings[currentDifficulty].ballSpeed,
             size: ballSize,
-            speed: ballSpeed
+            speed: difficultySettings[currentDifficulty].ballSpeed
         };
 
         let keysPressed = {};
@@ -277,7 +338,25 @@
         let mobileDownPressed = false;
         let isMobileDevice = window.innerWidth <= 768;
 
-        // Detect mobile device
+        function applyDifficulty(level) {
+            currentDifficulty = level;
+            const settings = difficultySettings[level];
+            computer.speed = settings.computerSpeed;
+            ball.speed = settings.ballSpeed;
+            ball.dx = (Math.random() > 0.5 ? 1 : -1) * ball.speed;
+            ball.dy = (Math.random() * 2 - 1) * ball.speed;
+
+            document.querySelectorAll('.difficulty-btn').forEach((button) => {
+                button.classList.toggle('active', button.dataset.difficulty === level);
+            });
+        }
+
+        document.querySelectorAll('.difficulty-btn').forEach((button) => {
+            button.addEventListener('click', () => {
+                applyDifficulty(button.dataset.difficulty);
+            });
+        });
+
         function checkMobileDevice() {
             isMobileDevice = window.innerWidth <= 768;
         }
@@ -307,12 +386,10 @@
             touchY = touch.clientY - rect.top;
         }, { passive: false });
 
-        document.addEventListener('touchend', (e) => {
-            // Reset touch position when touch ends
+        document.addEventListener('touchend', () => {
             touchY = canvas.height / 2;
         });
 
-        // Mobile button controls
         const upButton = document.getElementById('upButton');
         const downButton = document.getElementById('downButton');
 
@@ -321,16 +398,13 @@
                 e.preventDefault();
                 mobileUpPressed = true;
             });
-
             upButton.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 mobileUpPressed = false;
             });
-
             upButton.addEventListener('mousedown', () => {
                 mobileUpPressed = true;
             });
-
             upButton.addEventListener('mouseup', () => {
                 mobileUpPressed = false;
             });
@@ -341,24 +415,19 @@
                 e.preventDefault();
                 mobileDownPressed = true;
             });
-
             downButton.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 mobileDownPressed = false;
             });
-
             downButton.addEventListener('mousedown', () => {
                 mobileDownPressed = true;
             });
-
             downButton.addEventListener('mouseup', () => {
                 mobileDownPressed = false;
             });
         }
 
-        // Update player position based on input
         function updatePlayer() {
-            // Touch control for mobile (swiping on canvas)
             if (isMobileDevice && touchY !== canvas.height / 2) {
                 if (touchY < player.y + paddleHeight / 2) {
                     player.y -= player.speed;
@@ -367,15 +436,9 @@
                 }
             }
 
-            // Mobile button controls
-            if (mobileUpPressed) {
-                player.y -= player.speed;
-            }
-            if (mobileDownPressed) {
-                player.y += player.speed;
-            }
+            if (mobileUpPressed) player.y -= player.speed;
+            if (mobileDownPressed) player.y += player.speed;
 
-            // Mouse control (desktop)
             if (!isMobileDevice) {
                 if (mouseY < player.y + paddleHeight / 2) {
                     player.y -= player.speed;
@@ -384,53 +447,41 @@
                 }
             }
 
-            // Keyboard control
-            if (keysPressed['ArrowUp']) {
-                player.y -= player.speed;
-            }
-            if (keysPressed['ArrowDown']) {
-                player.y += player.speed;
-            }
+            if (keysPressed['ArrowUp']) player.y -= player.speed;
+            if (keysPressed['ArrowDown']) player.y += player.speed;
 
-            // Keep player in bounds
             if (player.y < 0) player.y = 0;
             if (player.y + player.height > canvas.height) {
                 player.y = canvas.height - player.height;
             }
         }
 
-        // Update computer AI
         function updateComputer() {
             const computerCenter = computer.y + computer.height / 2;
             const ballCenter = ball.y;
-            
-            // Increased dead zone from 35 to 60 - computer is less responsive
-            // This gives the player more opportunity to score
-            if (computerCenter < ballCenter - 60) {
+            const deadZone = difficultySettings[currentDifficulty].trackingDeadZone;
+
+            if (computerCenter < ballCenter - deadZone) {
                 computer.y += computer.speed;
-            } else if (computerCenter > ballCenter + 60) {
+            } else if (computerCenter > ballCenter + deadZone) {
                 computer.y -= computer.speed;
             }
 
-            // Keep computer in bounds
             if (computer.y < 0) computer.y = 0;
             if (computer.y + computer.height > canvas.height) {
                 computer.y = canvas.height - computer.height;
             }
         }
 
-        // Update ball position
         function updateBall() {
             ball.x += ball.dx;
             ball.y += ball.dy;
 
-            // Ball collision with top and bottom walls
             if (ball.y - ball.size < 0 || ball.y + ball.size > canvas.height) {
                 ball.dy = -ball.dy;
                 ball.y = Math.max(ball.size, Math.min(canvas.height - ball.size, ball.y));
             }
 
-            // Ball collision with paddles
             if (
                 ball.x - ball.size < player.x + player.width &&
                 ball.y > player.y &&
@@ -455,7 +506,6 @@
                 ball.x = computer.x - ball.size;
             }
 
-            // Scoring
             if (ball.x < 0) {
                 computer.score++;
                 resetBall();
@@ -471,11 +521,10 @@
         function resetBall() {
             ball.x = canvas.width / 2;
             ball.y = canvas.height / 2;
-            ball.dx = (Math.random() > 0.5 ? 1 : -1) * ballSpeed;
-            ball.dy = (Math.random() * 2 - 1) * ballSpeed;
+            ball.dx = (Math.random() > 0.5 ? 1 : -1) * ball.speed;
+            ball.dy = (Math.random() * 2 - 1) * ball.speed;
         }
 
-        // Draw functions
         function drawPaddle(paddle) {
             ctx.fillStyle = '#fff';
             ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
@@ -503,19 +552,15 @@
             document.getElementById('computerScore').textContent = computer.score;
         }
 
-        // Main game loop
         function gameLoop() {
-            // Clear canvas
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw game elements
             drawCenterLine();
             drawPaddle(player);
             drawPaddle(computer);
             drawBall();
 
-            // Update game state
             updatePlayer();
             updateComputer();
             updateBall();
@@ -523,7 +568,7 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // Start the game
+        applyDifficulty(currentDifficulty);
         gameLoop();
     </script>
 </body>
