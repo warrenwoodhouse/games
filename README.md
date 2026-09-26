@@ -20,7 +20,8 @@ Welcome to GotGames Interactive!
 # about
 I've been making mods, bug fixes, texture packs, mini games, games and more for the gaming community for over 21 years. For up to date news and upcoming games, please [CLICK HERE](https://warrenwoodhouse.blogspot.com/search/label/games).
 
-Founded: 19th October 2001
+## timeline
+* 19th October 2001: founding date
 
 # games
 Games, Apps and Mods by GotGames Interactive.
@@ -41,17 +42,17 @@ Check out the various categories below to find games that are available to play 
 * [Twisty Cube](https://warrenwoodhouse.github.io/games/twistycube): Free version of the Rubik Cube. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
 
 ## walking simulation games
-* Meerkat in a Poncho (coming soon)
+* Meerkat in a Poncho (TBA)
 
 ## horror games
-* [Darkness in Room 943](https://warrenwoodhouse.github.io/games/darknessinroom943) (coming soon)
+* [Darkness in Room 943](https://warrenwoodhouse.github.io/games/darknessinroom943) (TBA)
 
 ## text adventure games
 * Daft Freak & Friends (remade as “Smells Like Tuesday” by Charlie Birks of Daft Games)
 
 ## sci-fi games
-* [Quantum Jumper](https://warrenwoodhouse.github.io/games/quantumjumper) (coming soon)
-* [Bastille](https://warrenwoodhouse.github.io/games/bastille)
+* [Quantum Jumper](https://warrenwoodhouse.github.io/games/quantumjumper) (TBA)
+* [Bastille](https://warrenwoodhouse.github.io/games/bastille) (TBA)
 * [Bastille: Uprising](https://warrenwoodhouse.github.io/games/bastilleuprising) (TBA)
 
 ## arcade games
