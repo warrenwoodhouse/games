@@ -258,7 +258,7 @@
             height: paddleHeight,
             dy: 0,
             score: 0,
-            speed: 4.5
+            speed: 2.8  // Reduced from 4.5 - significantly slower
         };
 
         const ball = {
@@ -403,10 +403,12 @@
         function updateComputer() {
             const computerCenter = computer.y + computer.height / 2;
             const ballCenter = ball.y;
-
-            if (computerCenter < ballCenter - 35) {
+            
+            // Increased dead zone from 35 to 60 - computer is less responsive
+            // This gives the player more opportunity to score
+            if (computerCenter < ballCenter - 60) {
                 computer.y += computer.speed;
-            } else if (computerCenter > ballCenter + 35) {
+            } else if (computerCenter > ballCenter + 60) {
                 computer.y -= computer.speed;
             }
 
