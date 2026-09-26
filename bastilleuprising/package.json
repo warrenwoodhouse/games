@@ -1,0 +1,13 @@
+{
+  "name": "bastille-uprising",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Multi-level story-driven action game set during the Storming of the Bastille. Features quests, inventory, enemies, and historical narrative.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
