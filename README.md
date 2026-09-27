@@ -30,51 +30,93 @@ Games, Apps and Mods by GotGames Interactive.
 Check out the various categories below to find games that are available to play in your browser.
 
 ## card games
-* ![logo](https://raw.githubusercontent.com/warrenwoodhouse/logos/refs/heads/main/logos-simplifiedcaravan-small.png) [Simplified Caravan](https://warrenwoodhouse.github.io/games/caravancardgame): This free simplified version of the infamous fictional Caravan Card Game from Fallout: New Vegas. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
+### Simplified Caravan
+![logo](https://raw.githubusercontent.com/warrenwoodhouse/logos/refs/heads/main/logos-simplifiedcaravan-small.png)
+
+[Simplified Caravan](https://warrenwoodhouse.github.io/games/caravancardgame)
+
+This free simplified version of the infamous fictional Caravan Card Game from Fallout: New Vegas. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
 
 ## board games
-* ![logo](https://raw.githubusercontent.com/warrenwoodhouse/logos/refs/heads/main/logos-draughts-small.png) [Advanced Draughts (Checkers)](https://warrenwoodhouse.github.io/games/draughts): This free advanced version of the classic Draughts game lets you play with an AI bot or with a local player. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
+### Advanced Draughts
+![logo](https://raw.githubusercontent.com/warrenwoodhouse/logos/refs/heads/main/logos-draughts-small.png)
+
+[Play the Game](https://warrenwoodhouse.github.io/games/draughts)
+
+This free advanced version of the classic Draughts game lets you play with an AI bot or with a local player. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
 
 ## clicking games
-* ![logo](https://raw.githubusercontent.com/warrenwoodhouse/logos/refs/heads/main/logos-fiaj-small.png) [#FIAJ Fart in a Jar](https://warrenwoodhouse.github.io/games/fartinajar): This free game lets you tap a smelly jar that releases toxic odours with smelly and loud noises! See how many taps you can get! Can you create the highest score? Available to play directly in your browser. Built using HTML, CSS, SVG, MIDI and JavaScript.
+### Fart in a Jar
+![logo](https://raw.githubusercontent.com/warrenwoodhouse/logos/refs/heads/main/logos-fiaj-small.png)
+
+[Play the Game](https://warrenwoodhouse.github.io/games/fartinajar)
+
+This free game lets you tap a smelly jar that releases toxic odours with smelly and loud noises! See how many taps you can get! Can you create the highest score? Available to play directly in your browser. Built using HTML, CSS, SVG, MIDI and JavaScript. | Tags: #FIAJ
 
 ## puzzle games
-* [Twisty Cube](https://warrenwoodhouse.github.io/games/twistycube): Free version of the Rubik Cube. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
+### Twisty Cube
+![logo](https://raw.githubusercontent.com/warrenwoodhouse/logos/refs/heads/main/logos-twistycube-small.png)
+
+[Play the Game](https://warrenwoodhouse.github.io/games/twistycube)
+
+Free version of the Rubik Cube. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
 
 ## walking simulation games
-* Meerkat in a Poncho (TBA)
+### Meerkat in a Poncho
+[Play the Game](https://warrenwoodhouse.github.io/games/meerkatinaponcho)
+(TBA)
 
 ## horror games
-* [Darkness in Room 943](https://warrenwoodhouse.github.io/games/darknessinroom943) (TBA)
+### Darkness in Room 943
+[Play the Game](https://warrenwoodhouse.github.io/games/darknessinroom943)
+(TBA)
 
 ## text adventure games
-* Daft Freak & Friends (remade as “Smells Like Tuesday” by Charlie Birks of Daft Games)
+### Daft Freak & Friends
+Remade as “Smells Like Tuesday” by Charlie Birks of Daft Games
 
 ## sci-fi games
-* [Quantum Jumper](https://warrenwoodhouse.github.io/games/quantumjumper) (TBA)
-* [Bastille](https://warrenwoodhouse.github.io/games/bastille) (TBA)
-* [Bastille: Uprising](https://warrenwoodhouse.github.io/games/bastilleuprising) (TBA)
+### Quantum Jumper
+[Play the Game](https://warrenwoodhouse.github.io/games/quantumjumper)
+(TBA)
+
+### Bastille
+[Play the Game](https://warrenwoodhouse.github.io/games/bastille)
+(TBA)
+
+### Bastille: Uprising
+[Play the Game](https://warrenwoodhouse.github.io/games/bastilleuprising)
+(TBA)
 
 ## arcade games
-* ![logo](https://raw.githubusercontent.com/warrenwoodhouse/logos/refs/heads/main/logos-pong.png) [Pong](https://warrenwoodhouse.github.io/games/pong): A free and advanced version of the classic Pong game with some modern features for additional functionality. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
+### Pong
+![logo](https://raw.githubusercontent.com/warrenwoodhouse/logos/refs/heads/main/logos-pong.png)
+
+[Play the Game](https://warrenwoodhouse.github.io/games/pong)
+
+A free and advanced version of the classic Pong game with some modern features for additional functionality. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
 
 # texture packs
-* [Newcastle upon Tyne UK’s Metro Reskin for the Liberty City Subway on Grand Theft Auto III](https://github.com/warrenwoodhouse/gta3/releases/tag/newcastleupontyneuknexusmetrotexturepack)
-* [Daft Freak & Friends Texture Pack for Smells Like Tuesday](https://old.daft.games/tags/tag/Daft-Freak)
+## Newcastle upon Tyne UK’s Nexus Metro Reskin for the Liberty City Subway Texture Pack for Grand Theft Auto III
+[Download the Mod](https://github.com/warrenwoodhouse/gta3/releases/tag/newcastleupontyneuknexusmetrotexturepack)
+
+## Daft Freak & Friends Texture Pack for Smells Like Tuesday
+[Download the Texture Pack](https://old.daft.games/tags/tag/Daft-Freak)
 
 # engines
 These game engines were used in the development of my games. Some of these are Coding Languages.
 
 ## coding languages
 * [YaBASIC](https://www.yabasic.de/)
-* [HTML HyperText Markup Language](https://html.spec.whatwg.org/) <caption>([HTML Living Standard on GitHub](https://github.com/whatwg/html))</caption>
+* [HTML HyperText Markup Language](https://html.spec.whatwg.org/) ([HTML Living Standard on GitHub](https://github.com/whatwg/html))
 * [JavaScript](https://www.javascript.com/)
-* [ISO C++](https://isocpp.org/) <caption>([Topic on GitHub](https://github.com/topics/cpp))</caption>
-* [Python](https://www.python.org/) <caption>([Python on GitHub](https://github.com/python))</caption>
-* [Cubing](https://js.cubing.net/) <caption>([CubingJS on GitHub](https://github.com/cubing/cubing.js))</caption>
+* [ISO C++](https://isocpp.org/) ([Topic on GitHub](https://github.com/topics/cpp))
+* [Python](https://www.python.org/) ([Python on GitHub](https://github.com/python))
+* [Cubing](https://js.cubing.net/) ([CubingJS on GitHub](https://github.com/cubing/cubing.js))
 
 ## game engines
-* Warren Engine: A in-house programming framework for developing games. Currently under development.
+### Warren Engine
+A in-house programming framework for developing games. Currently under development.
 
 # soundtracks
 coming soon
