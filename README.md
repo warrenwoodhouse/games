@@ -56,7 +56,7 @@ Check out the various categories below to find games that are available to play 
 * [Bastille: Uprising](https://warrenwoodhouse.github.io/games/bastilleuprising) (TBA)
 
 ## arcade games
-* [Pong](https://warrenwoodhouse.github.io/games/pong)
+* ![logo](https://raw.githubusercontent.com/warrenwoodhouse/logos/refs/heads/main/logos-pong.png) [Pong](https://warrenwoodhouse.github.io/games/pong): A free and advanced version of the classic Pong game with some modern features for additional functionality. Available to play directly in your browser. Built using HTML, CSS and JavaScript.
 
 # texture packs
 * [Newcastle upon Tyne UK’s Metro Reskin for the Liberty City Subway on Grand Theft Auto III](https://github.com/warrenwoodhouse/gta3/releases/tag/newcastleupontyneuknexusmetrotexturepack)
