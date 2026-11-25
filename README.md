@@ -1,3 +1,10 @@
+<html>
+  <head>
+  <!-- ICONS META DATA -->
+<link rel="icon" href="https://warrenwoodhouse.github.io/games/favicon.ico" type="image/ico"/>
+<link rel="shortcut icon" href="https://warrenwoodhouse.github.io/games/favicon.ico" type="image/ico"/>
+</head>
+</html>
 <a href="https://warrenwoodhouse.blogspot.com/games"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiXMVroIPc502khniPXkyRhAQNf29M3L2FPQQmLNyBWwpeAxRH3U4xYKBFfGzVyxAfMoI_76Va4T0rIulT_J7aPadvtyTTx3NMEBGn5eHRPDrhae8pS0eGT2lPp0TzljOlAHSsHADgTbrgufuKIodohBJPwXn6j0-1PinubtoPNl2QH0cpY96BTorr4utU/s1200/IMG_6013.png"></a>
 
 Welcome to GotGames Interactive!
